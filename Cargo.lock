@@ -396,7 +396,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ic-rusqlite-backend"
+name = "ic-rusqlite"
 version = "0.1.0"
 dependencies = [
  "anyhow",
