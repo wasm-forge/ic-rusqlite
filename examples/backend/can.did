@@ -1,0 +1,39 @@
+type Error = variant {
+    InvalidCanister;
+    CanisterError : record {
+        message : text;
+    };
+};
+
+type Result = variant {
+    Ok: text;
+    Err : Error;
+};
+
+type Person = record {
+    name: text;
+    age: nat64
+};
+
+type QueryParams = record {
+    limit: nat64;
+    offset: nat64;
+};
+
+type FilterParams = record {
+    name: text
+};
+
+type UpdateParams = record {
+    id: nat64;
+    name: text;
+};
+
+service : {
+    "create": () -> (Result);
+    "query": (QueryParams) -> (Result) query;
+    "query_filter": (FilterParams) -> (Result) query;
+    "insert": (Person) -> (Result);
+    "delete": (nat64) -> (Result);
+    "update": (UpdateParams) -> (Result);
+}
