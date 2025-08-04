@@ -9,7 +9,7 @@ fn main() {
     } else {
         match std::env::consts::OS {
             "linux" => "/opt/wasi-sdk".to_string(),
-            "macos" => "/opt/homebrew/opt/wasi-sdk".to_string(),
+            "macos" => "/opt/wasi-sdk".to_string(),
             other => panic!("Unsupported OS: {other}"),
         }
     };
