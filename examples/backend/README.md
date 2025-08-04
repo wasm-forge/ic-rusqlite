@@ -1,16 +1,27 @@
 ## Examples Container
 
-## Summary
-Example of using ICSQLite in IC Canister
+Example of using SQLite in an IC Canister
 
-## Setup
 
-To build and install this code, you will need:
+## Prerequisites
 
-- Git
-- [DFX] version 0.28.0
-- [Rust] version 1.88.0 or later
+It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
 
+
+You also need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
+Once installed the `clang` compiler should be available from the path `/opt/wasi-sdk/bin/`. 
+
+If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK`:
+```bash
+export WASI_SDK=/opt/wasi-sdk
+```
+
+Finally, install the `wasi2ic` tool:
+```bash
+cargo install wasi2ic
+```
+
+## Preparation
 To start the local replica before installing the canister:
 
 ```sh
@@ -22,10 +33,9 @@ Register, build and deploy the project.
 dfx deploy
 ```
 
-
 ## Testing
 
-After deployment, you can open the backend in browser or run the test script from a command line:
+After deployment, you can open the backend in your browser or run the test script from a command line:
 
 ```sh
 test.sh

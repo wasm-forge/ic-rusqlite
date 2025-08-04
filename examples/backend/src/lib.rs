@@ -1,10 +1,12 @@
-#[macro_use]
-extern crate ic_cdk_macros;
+//#[macro_use]
+//extern crate ic_cdk_macros;
 #[macro_use]
 extern crate serde;
 
 use candid::CandidType;
-use ic_cdk::api::call::RejectionCode;
+use ic_cdk::call::RejectCode;
+use ic_cdk::query;
+use ic_cdk::update;
 use ic_rusqlite::get_connection;
 
 #[update]
@@ -169,10 +171,10 @@ enum Error {
 
 type Result<T = String, E = Error> = std::result::Result<T, E>;
 
-impl From<(RejectionCode, String)> for Error {
-    fn from((code, message): (RejectionCode, String)) -> Self {
+impl From<(RejectCode, String)> for Error {
+    fn from((code, message): (RejectCode, String)) -> Self {
         match code {
-            RejectionCode::CanisterError => Self::CanisterError { message },
+            RejectCode::CanisterError => Self::CanisterError { message },
             _ => Self::InvalidCanister,
         }
     }
