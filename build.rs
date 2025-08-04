@@ -27,8 +27,8 @@ fn main() {
         println!("cargo:rustc-link-search={}", path.display());
 
         match std::env::consts::OS {
-            "linux" => println!("cargo:rustc-link-arg=-lclang_rt.builtins-wasm32"),
-            "macos" => println!("cargo:rustc-link-arg=-lclang_rt.builtins.a"),
+            "linux" => println!("cargo:rustc-link-arg=-lclang_rt.builtins"),
+            "macos" => println!("cargo:rustc-link-arg=-lclang_rt.builtins"),
             other => panic!("Unsupported OS: {other}"),
         }
     } else {

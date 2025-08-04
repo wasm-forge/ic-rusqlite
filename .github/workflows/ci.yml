@@ -62,16 +62,11 @@ jobs:
 
           tar -xzf wasi-sdk.tar.gz
 
-          echo `which clang`
-          clang --version
+          export PATH=$WASI_SDK/bin:$PATH
 
           echo "$WASI_SDK/bin" >> $GITHUB_PATH
 
-          echo `which clang`
-          clang --version
-
-
-      - name: check clang install
+      - name: Check clang install
         run: |
           echo `which clang`
           clang --version
