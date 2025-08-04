@@ -1,4 +1,6 @@
 use rusqlite::Connection;
+use rusqlite::ToSql;
+
 use std::cell::RefCell;
 use std::ops::Range;
 use std::rc::Rc;
@@ -31,6 +33,29 @@ thread_local! {
     };
 }
 
+fn set_pragmas(conn: &Connection) {
+    // do not create and destroy the journal file every time
+    conn.pragma_update(None, "journal_mode", &"PERSIST" as &dyn ToSql)
+        .unwrap();
+
+    // writes are not cached on mounted memory, no need to call sync
+    conn.pragma_update(None, "synchronous", &0 as &dyn ToSql)
+        .unwrap();
+
+    // reduce locks and unlocks
+    conn.pragma_update(None, "locking_mode", &"EXCLUSIVE" as &dyn ToSql)
+        .unwrap();
+
+    // temp_store = MEMORY, disables creating temp files, improves performance,
+    // this workaround also avoids sqlite error on creating a tmp file on complex queries
+    conn.pragma_update(None, "temp_store", &"MEMORY" as &dyn ToSql)
+        .unwrap();
+
+    // reduce read operations by caching database pages
+    conn.pragma_update(None, "cache_size", &1000000 as &dyn ToSql)
+        .unwrap();
+}
+
 fn init_db() -> Rc<Connection> {
     let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(DEFAULT_MOUNTED_DB_ID)));
 
@@ -44,17 +69,7 @@ fn init_db() -> Rc<Connection> {
     let conn = rusqlite::Connection::open(DB_FILE_NAME).expect("Failed opening the database!");
 
     // set pragmas
-    conn.execute_batch(
-        r#"
-            PRAGMA page_size=4096;
-            PRAGMA journal_mode=MEMORY;
-            PRAGMA synchronous=0;
-            PRAGMA locking_mode=EXCLUSIVE;
-            PRAGMA temp_store=MEMORY;
-            PRAGMA cache_size=100000;
-            "#,
-    )
-    .unwrap();
+    set_pragmas(&conn);
 
     CONNECTION.with_borrow_mut(|c| {
         *c = Some(Rc::new(conn));
