@@ -28,9 +28,13 @@ jobs:
 
       - name: Install dfx
         uses: dfinity/setup-dfx@main
-            
-      - name: Install wasi2ic
-        run: cargo install wasi2ic
 
       - name: Build
-        run: cargo install wasi2ic
+        run: cargo build --release --target wasm32-wasip1
+            
+#      - name: Install wasi2ic
+#        run: cargo install wasi2ic
+        
+#      - name: Run wasi2ic
+#        run: wasi2ic target/wasm32-wasip1/release/
+        
