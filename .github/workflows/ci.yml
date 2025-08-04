@@ -62,14 +62,18 @@ jobs:
 
           tar -xzf wasi-sdk.tar.gz
 
-          export PATH=$WASI_SDK/bin:$PATH
-
           echo "$WASI_SDK/bin" >> $GITHUB_PATH
 
       - name: Check clang install
         run: |
           echo `which clang`
           clang --version
+
+      - name: Check WASI_SDK
+        run: |
+          echo WASI_SDK...
+          echo $WASI_SDK
+          echo ...
 
       - name: Build
         run: cargo build --release --target wasm32-wasip1
