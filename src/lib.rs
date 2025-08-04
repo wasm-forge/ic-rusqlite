@@ -37,6 +37,9 @@ fn init_db() -> Rc<Connection> {
     // dedicate a virtual memory to the database file
     ic_wasi_polyfill::mount_memory_file(DB_FILE_NAME, Box::new(memory));
 
+    // remove lock if it exists
+    let _ = std::fs::remove_dir_all(format!("{DB_FILE_NAME}.lock"));
+
     // Create a new connection to the file
     let conn = rusqlite::Connection::open(DB_FILE_NAME).expect("Failed opening the database!");
 

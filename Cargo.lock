@@ -424,8 +424,9 @@ dependencies = [
 
 [[package]]
 name = "ic-wasi-polyfill"
-version = "0.9.1"
-source = "git+https://github.com/wasm-forge/ic-wasi-polyfill.git?rev=6035e4dbc7cfd22301d4c718282b65ef180baca8#6035e4dbc7cfd22301d4c718282b65ef180baca8"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "689670a02d4cc0e89dbfa35c2e579bc18cfd18a82a76692a02d2a91411804462"
 dependencies = [
  "anyhow",
  "ic-cdk",
