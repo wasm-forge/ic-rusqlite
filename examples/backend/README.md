@@ -1,6 +1,6 @@
 ## Examples Container
 
-Example of using SQLite in an IC Canister
+Build a basic example of using SQLite in an IC Canister.
 
 
 ## Prerequisites
