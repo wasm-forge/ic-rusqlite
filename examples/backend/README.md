@@ -24,12 +24,12 @@ cargo install wasi2ic
 ## Preparation
 To start the local replica before installing the canister:
 
-```sh
+```bash
 dfx start --background --clean
 ```
 
 Register, build and deploy the project.
-```sh
+```bash
 dfx deploy
 ```
 
@@ -37,6 +37,6 @@ dfx deploy
 
 After deployment, you can open the backend in your browser or run the test script from a command line:
 
-```sh
+```bash
 test.sh
 ```
