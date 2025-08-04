@@ -8,7 +8,7 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-candid = "0.10.16"
+candid = "0.10.14"
 ic-cdk = "0.18.3"
 hex = "0.4.3"
 serde = "1.0.164"
@@ -17,7 +17,7 @@ serde_json = "1.0.142"
 ic-stable-structures = "0.7.0"
 ic-wasi-polyfill = {git = "https://github.com/wasm-forge/ic-wasi-polyfill.git", package="ic-wasi-polyfill", rev = "6035e4dbc7cfd22301d4c718282b65ef180baca8"}
 
-sqlite-vfs = { version = "0.2" }
+
 rusqlite = {version = "0.37.0", features = ["bundled", "wasm32-wasi-vfs"] }
 anyhow = "1.0.98"
 rand = "0.9.2"
