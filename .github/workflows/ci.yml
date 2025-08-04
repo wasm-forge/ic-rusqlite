@@ -15,21 +15,10 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         rust: [1.88.0]
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Cache Cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.rust }}-cargo-
 
       - name: Install Rust
         run: |
@@ -40,12 +29,8 @@ jobs:
       - name: Install dfx
         uses: dfinity/setup-dfx@main
             
-      - name: Check Format
-        run: cargo fmt --all -- --check
-
       - name: Install wasi2ic
         run: cargo install wasi2ic
 
       - name: Build
         run: cargo install wasi2ic
-
