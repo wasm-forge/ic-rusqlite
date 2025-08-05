@@ -12,6 +12,7 @@ use ic_rusqlite::get_connection;
 #[update]
 fn create() -> Result {
     let conn = get_connection();
+    // create database table
     return match conn.execute(
         "CREATE TABLE IF NOT EXISTS person (
             id   INTEGER PRIMARY KEY,
@@ -30,6 +31,8 @@ fn create() -> Result {
 #[query]
 fn query(params: QueryParams) -> Result {
     let conn = get_connection();
+
+    // prepare statement with parameters
     let mut stmt = match conn.prepare("select * from person limit ?1 offset ?2") {
         Ok(e) => e,
         Err(err) => {
@@ -38,6 +41,8 @@ fn query(params: QueryParams) -> Result {
             });
         }
     };
+
+    // query with parameters and process it on a row-by-row basis
     let person_iter = match stmt.query_map((params.limit, params.offset), |row| {
         Ok(PersonQuery {
             id: row.get(0).unwrap(),
@@ -52,6 +57,7 @@ fn query(params: QueryParams) -> Result {
             });
         }
     };
+
     let mut persons = Vec::new();
     for person in person_iter {
         persons.push(person.unwrap());
@@ -63,6 +69,7 @@ fn query(params: QueryParams) -> Result {
 #[query]
 fn query_filter(params: FilterParams) -> Result {
     let conn = get_connection();
+
     let mut stmt = match conn.prepare("select * from person where name=?1") {
         Ok(e) => e,
         Err(err) => {
@@ -71,7 +78,8 @@ fn query_filter(params: FilterParams) -> Result {
             });
         }
     };
-    let person_iter = match stmt.query_map((params.name,), |row| {
+
+    let person_iter = match stmt.query_map((params.name), |row| {
         Ok(PersonQuery {
             id: row.get(0).unwrap(),
             name: row.get(1).unwrap(),
@@ -96,8 +104,10 @@ fn query_filter(params: FilterParams) -> Result {
 #[update]
 fn insert(person: Person) -> Result {
     let conn = get_connection();
+
+    // execute query
     return match conn.execute(
-        "insert into person (name, age) values (?1, ?2);",
+        "INSERT INTO person (name, age) values (?1, ?2);",
         (person.name, person.age),
     ) {
         Ok(e) => Ok(format!("{:?}", e)),

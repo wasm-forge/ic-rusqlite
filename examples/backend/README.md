@@ -21,17 +21,14 @@ Finally, install the `wasi2ic` tool:
 cargo install wasi2ic
 ```
 
-## Preparation
-To start the local replica before installing the canister:
+## Building
+
+To build and deploy the example canister, start the build script:
 
 ```bash
-dfx start --background --clean
+build.sh
 ```
 
-Register, build and deploy the project.
-```bash
-dfx deploy
-```
 
 ## Testing
 
