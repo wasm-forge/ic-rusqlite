@@ -10,7 +10,8 @@ fn main() {
         "/opt/wasi-sdk".to_string()
     };
 
-    //println!("cargo:rustc-link-arg=--sysroot={sdk_path}/share/wasi-sysroot");
+    let sysroot = format!("{sdk_path}/share/wasi-sysroot");
+    println!("cargo:rustc-env=WASI_SYSROOT={sysroot}",);
 
     let pattern = format!("{sdk_path}/lib/clang/*/lib/*wasip1");
 

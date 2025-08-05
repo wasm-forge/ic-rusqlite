@@ -17,7 +17,6 @@ export WASI_SDK=/opt/wasi-sdk
 You will also need to make sure the `clang` is found and `WASI_SYSROOT` is specified:
 ```bash
 export PATH=$WASI_SDK/bin:$PATH
-export WASI_SYSROOT=$WASI_SDK/share/wasi-sysroot
 ```
 
 
