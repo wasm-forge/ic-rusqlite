@@ -6,7 +6,6 @@ This is a convenience package to create a canister with the Sqlite support.
 
 It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
 
-
 You also need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
 Once installed the `clang` compiler should be available from the path `/opt/wasi-sdk/bin/`. 
 
@@ -14,6 +13,13 @@ If your WASI installation is in a different folder, assign it to environment var
 ```bash
 export WASI_SDK=/opt/wasi-sdk
 ```
+
+You will also need to make sure the `clang` is found and `WASI_SYSROOT` is specified:
+```bash
+export PATH=$WASI_SDK/bin:$PATH
+export WASI_SYSROOT=$WASI_SDK/share/wasi-sysroot
+```
+
 
 Finally, install the `wasi2ic` tool:
 ```bash
