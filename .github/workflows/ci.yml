@@ -41,17 +41,17 @@ jobs:
           echo "Detected Arch: ${{ matrix.arch }}"
 
           if [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.arch }}" == "x64" ]]; then
-            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-27/wasi-sdk-27.0-x86_64-linux.tar.gz
-            export WASI_SDK=`pwd`/wasi-sdk-27.0-x86_64-linux
+            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-25/wasi-sdk-25.0-x86_64-linux.tar.gz
+            export WASI_SDK=`pwd`/wasi-sdk-25.0-x86_64-linux
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.arch }}" == "arm64" ]]; then
-            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-27/wasi-sdk-27.0-arm64-linux.tar.gz
-            export WASI_SDK=`pwd`/wasi-sdk-27.0-arm64-linux
+            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-25/wasi-sdk-25.0-arm64-linux.tar.gz
+            export WASI_SDK=`pwd`/wasi-sdk-25.0-arm64-linux
           elif [[ "${{ matrix.os }}" == "macos-latest" && "${{ matrix.arch }}" == "x64" ]]; then
-            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-27/wasi-sdk-27.0-x86_64-macos.tar.gz
-            export WASI_SDK=`pwd`/wasi-sdk-27.0-x86_64-macos
+            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-25/wasi-sdk-25.0-x86_64-macos.tar.gz
+            export WASI_SDK=`pwd`/wasi-sdk-25.0-x86_64-macos
           elif [[ "${{ matrix.os }}" == "macos-latest" && "${{ matrix.arch }}" == "arm64" ]]; then
-            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-27/wasi-sdk-27.0-arm64-macos.tar.gz
-            export WASI_SDK=`pwd`/wasi-sdk-27.0-arm64-macos
+            curl -L -o wasi-sdk.tar.gz https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-25/wasi-sdk-25.0-arm64-macos.tar.gz
+            export WASI_SDK=`pwd`/wasi-sdk-25.0-arm64-macos
           else
             echo "Unsupported OS/Architecture combination"
             exit 1
@@ -62,7 +62,7 @@ jobs:
           tar -xzf wasi-sdk.tar.gz
 
           echo "$WASI_SDK/bin" >> $GITHUB_PATH
-          
+
       - name: Check clang install
         run: |
           echo `which clang`
