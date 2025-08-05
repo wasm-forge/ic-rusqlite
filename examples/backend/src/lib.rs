@@ -79,7 +79,7 @@ fn query_filter(params: FilterParams) -> Result {
         }
     };
 
-    let person_iter = match stmt.query_map((params.name), |row| {
+    let person_iter = match stmt.query_map((params.name,), |row| {
         Ok(PersonQuery {
             id: row.get(0).unwrap(),
             name: row.get(1).unwrap(),

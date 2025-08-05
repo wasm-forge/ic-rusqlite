@@ -15,7 +15,7 @@ const FS_MEMORY_RANGE: Range<u8> = 200..210;
 const DEFAULT_MOUNTED_DB_ID: u8 = 120;
 
 /// Database file name
-const DB_FILE_NAME: &str = "main.db";
+const DB_FILE_NAME: &str = "/main.db";
 
 // re-export some of the core dependencies for others to use
 pub use ic_wasi_polyfill;
@@ -27,6 +27,7 @@ thread_local! {
     pub static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = {
 
         let m = MemoryManager::init(DefaultMemoryImpl::default());
+
         // initialize ic-wasi-polyfill
         ic_wasi_polyfill::init_with_memory_manager(&[0u8; 32], &[], &m, FS_MEMORY_RANGE);
         RefCell::new(m)
