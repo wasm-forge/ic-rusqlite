@@ -60,6 +60,8 @@ jobs:
             exit 1
           fi
 
+          echo "WASI_SDK=$WASI_SDK" >> $GITHUB_ENV
+
           tar -xzf wasi-sdk.tar.gz
 
           echo "$WASI_SDK/bin" >> $GITHUB_PATH
