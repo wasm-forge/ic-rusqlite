@@ -13,6 +13,9 @@ fn main() {
     let sysroot = format!("{sdk_path}/share/wasi-sysroot");
     println!("cargo:rustc-env=WASI_SYSROOT={sysroot}",);
 
+    let clang_path = format!("{sdk_path}/bin/clang");
+    println!("cargo:rustc-env=CC={clang_path}");
+
     let pattern = format!("{sdk_path}/lib/clang/*/lib/*wasip1");
 
     let paths: Vec<PathBuf> = glob(&pattern)
