@@ -15,12 +15,12 @@ jobs:
         include:
           - os: ubuntu-latest
             arch: x64
-#          - os: ubuntu-latest
-#            arch: arm64
-#          - os: macos-latest
-#            arch: x64
-#          - os: macos-latest
-#            arch: arm64
+          - os: ubuntu-latest
+            arch: arm64
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
 
 
     runs-on: ${{ matrix.os }}
@@ -65,6 +65,8 @@ jobs:
           tar -xzf wasi-sdk.tar.gz
 
           echo "$WASI_SDK/bin" >> $GITHUB_PATH
+
+          echo "WASI_SYSROOT=$WASI_SDK/share/wasi-sysroot" >> $GITHUB_ENV
 
       - name: Check clang install
         run: |
