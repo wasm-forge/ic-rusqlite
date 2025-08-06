@@ -6,12 +6,12 @@ This is a convenience package to create a canister with the Sqlite support.
 
 It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
 
-You will need to install the wasi target for Rust:
+The WASI preview1 target for Rust will be used:
 ```bash
 rustup target add wasm32-wasip1
 ```
 
-You also need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
+You need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
 Once installed the `clang` compiler should be available from the path `/opt/wasi-sdk/bin/`. 
 
 If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK`:
@@ -33,7 +33,7 @@ cargo install wasi2ic
 
 ## Developing casniter
 
-To enable `rusqlite` in your canister, add the helper dependency:
+To enable `rusqlite` in your canister, add the helper dependency into your backend canister:
 ```bash
 cargo add ic-rusqlite
 ```

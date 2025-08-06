@@ -7,140 +7,143 @@ use candid::CandidType;
 use ic_cdk::call::RejectCode;
 use ic_cdk::query;
 use ic_cdk::update;
-use ic_rusqlite::get_connection;
+use ic_rusqlite::with_connection;
 
 #[update]
 fn create() -> Result {
-    let conn = get_connection();
-    // create database table
-    return match conn.execute(
-        "CREATE TABLE IF NOT EXISTS person (
+    with_connection(|conn| {
+        // create database table
+        match conn.execute(
+            "CREATE TABLE IF NOT EXISTS person (
             id   INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             age INTEGER
         )",
-        [],
-    ) {
-        Ok(e) => Ok(format!("{:?}", e)),
-        Err(err) => Err(Error::CanisterError {
-            message: format!("{:?}", err),
-        }),
-    };
+            [],
+        ) {
+            Ok(e) => Ok(format!("{:?}", e)),
+            Err(err) => Err(Error::CanisterError {
+                message: format!("{:?}", err),
+            }),
+        }
+    })
 }
 
 #[query]
 fn query(params: QueryParams) -> Result {
-    let conn = get_connection();
+    with_connection(|conn| {
+        // prepare statement with parameters
+        let mut stmt = match conn.prepare("select * from person limit ?1 offset ?2") {
+            Ok(e) => e,
+            Err(err) => {
+                return Err(Error::CanisterError {
+                    message: format!("{:?}", err),
+                });
+            }
+        };
 
-    // prepare statement with parameters
-    let mut stmt = match conn.prepare("select * from person limit ?1 offset ?2") {
-        Ok(e) => e,
-        Err(err) => {
-            return Err(Error::CanisterError {
-                message: format!("{:?}", err),
-            });
+        // query with parameters and process it on a row-by-row basis
+        let person_iter = match stmt.query_map((params.limit, params.offset), |row| {
+            Ok(PersonQuery {
+                id: row.get(0).unwrap(),
+                name: row.get(1).unwrap(),
+                age: row.get(2).unwrap(),
+            })
+        }) {
+            Ok(e) => e,
+            Err(err) => {
+                return Err(Error::CanisterError {
+                    message: format!("{:?}", err),
+                });
+            }
+        };
+
+        let mut persons = Vec::new();
+        for person in person_iter {
+            persons.push(person.unwrap());
         }
-    };
-
-    // query with parameters and process it on a row-by-row basis
-    let person_iter = match stmt.query_map((params.limit, params.offset), |row| {
-        Ok(PersonQuery {
-            id: row.get(0).unwrap(),
-            name: row.get(1).unwrap(),
-            age: row.get(2).unwrap(),
-        })
-    }) {
-        Ok(e) => e,
-        Err(err) => {
-            return Err(Error::CanisterError {
-                message: format!("{:?}", err),
-            });
-        }
-    };
-
-    let mut persons = Vec::new();
-    for person in person_iter {
-        persons.push(person.unwrap());
-    }
-    let res = serde_json::to_string(&persons).unwrap();
-    Ok(res)
+        let res = serde_json::to_string(&persons).unwrap();
+        Ok(res)
+    })
 }
 
 #[query]
 fn query_filter(params: FilterParams) -> Result {
-    let conn = get_connection();
+    with_connection(|conn| {
+        let mut stmt = match conn.prepare("select * from person where name=?1") {
+            Ok(e) => e,
+            Err(err) => {
+                return Err(Error::CanisterError {
+                    message: format!("{:?}", err),
+                });
+            }
+        };
 
-    let mut stmt = match conn.prepare("select * from person where name=?1") {
-        Ok(e) => e,
-        Err(err) => {
-            return Err(Error::CanisterError {
-                message: format!("{:?}", err),
-            });
+        let person_iter = match stmt.query_map((params.name,), |row| {
+            Ok(PersonQuery {
+                id: row.get(0).unwrap(),
+                name: row.get(1).unwrap(),
+                age: row.get(2).unwrap(),
+            })
+        }) {
+            Ok(e) => e,
+            Err(err) => {
+                return Err(Error::CanisterError {
+                    message: format!("{:?}", err),
+                });
+            }
+        };
+        let mut persons = Vec::new();
+        for person in person_iter {
+            persons.push(person.unwrap());
         }
-    };
-
-    let person_iter = match stmt.query_map((params.name,), |row| {
-        Ok(PersonQuery {
-            id: row.get(0).unwrap(),
-            name: row.get(1).unwrap(),
-            age: row.get(2).unwrap(),
-        })
-    }) {
-        Ok(e) => e,
-        Err(err) => {
-            return Err(Error::CanisterError {
-                message: format!("{:?}", err),
-            });
-        }
-    };
-    let mut persons = Vec::new();
-    for person in person_iter {
-        persons.push(person.unwrap());
-    }
-    let res = serde_json::to_string(&persons).unwrap();
-    Ok(res)
+        let res = serde_json::to_string(&persons).unwrap();
+        Ok(res)
+    })
 }
 
 #[update]
 fn insert(person: Person) -> Result {
-    let conn = get_connection();
-
-    // execute query
-    return match conn.execute(
-        "INSERT INTO person (name, age) values (?1, ?2);",
-        (person.name, person.age),
-    ) {
-        Ok(e) => Ok(format!("{:?}", e)),
-        Err(err) => Err(Error::CanisterError {
-            message: format!("{:?}", err),
-        }),
-    };
+    with_connection(|conn| {
+        // execute insertion query
+        match conn.execute(
+            "INSERT INTO person (name, age) values (?1, ?2);",
+            (person.name, person.age),
+        ) {
+            Ok(e) => Ok(format!("{:?}", e)),
+            Err(err) => Err(Error::CanisterError {
+                message: format!("{:?}", err),
+            }),
+        }
+    })
 }
 
 #[update]
 fn delete(id: usize) -> Result {
-    let conn = get_connection();
-    return match conn.execute("delete from person where id=?1", (id,)) {
-        Ok(e) => Ok(format!("{:?}", e)),
-        Err(err) => Err(Error::CanisterError {
-            message: format!("{:?}", err),
-        }),
-    };
+    with_connection(
+        |conn| match conn.execute("delete from person where id=?1", (id,)) {
+            Ok(e) => Ok(format!("{:?}", e)),
+
+            Err(err) => Err(Error::CanisterError {
+                message: format!("{:?}", err),
+            }),
+        },
+    )
 }
 
 #[update]
 fn update(params: UpdateParams) -> Result {
-    let conn = get_connection();
-
-    return match conn.execute(
-        "update person set name=?1 where id=?2",
-        (params.name, params.id),
-    ) {
-        Ok(e) => Ok(format!("{:?}", e)),
-        Err(err) => Err(Error::CanisterError {
-            message: format!("{:?}", err),
-        }),
-    };
+    with_connection(|conn| {
+        match conn.execute(
+            "update person set name=?1 where id=?2",
+            (params.name, params.id),
+        ) {
+            Ok(e) => Ok(format!("{:?}", e)),
+            Err(err) => Err(Error::CanisterError {
+                message: format!("{:?}", err),
+            }),
+        }
+    })
 }
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]

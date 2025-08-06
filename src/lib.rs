@@ -2,8 +2,8 @@ use rusqlite::Connection;
 use rusqlite::ToSql;
 
 use std::cell::RefCell;
+use std::cell::RefMut;
 use std::ops::Range;
-use std::rc::Rc;
 
 use ic_stable_structures::memory_manager::MemoryId;
 use ic_stable_structures::{DefaultMemoryImpl, memory_manager::MemoryManager};
@@ -22,8 +22,6 @@ pub use ic_wasi_polyfill;
 pub use rusqlite;
 
 thread_local! {
-    pub static CONNECTION: RefCell<Option<Rc<Connection>>> = const { RefCell::new(None) };
-
     pub static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = {
 
         let m = MemoryManager::init(DefaultMemoryImpl::default());
@@ -32,6 +30,25 @@ thread_local! {
         ic_wasi_polyfill::init_with_memory_manager(&[0u8; 32], &[], &m, FS_MEMORY_RANGE);
         RefCell::new(m)
     };
+
+    pub static CONNECTION: RefCell<Connection> = RefCell::new({
+        let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(DEFAULT_MOUNTED_DB_ID)));
+
+        // dedicate a virtual memory to the database file
+        ic_wasi_polyfill::mount_memory_file(DB_FILE_NAME, Box::new(memory));
+
+        // remove lock if it exists
+        let _ = std::fs::remove_dir_all(format!("{DB_FILE_NAME}.lock"));
+
+        // Create a new connection to the file
+        let conn = rusqlite::Connection::open(DB_FILE_NAME).expect("Failed opening the database!");
+
+        // set pragmas
+        set_pragmas(&conn);
+
+        conn
+    })
+
 }
 
 fn set_pragmas(conn: &Connection) {
@@ -40,7 +57,7 @@ fn set_pragmas(conn: &Connection) {
         .unwrap();
 
     // writes are not cached on mounted memory, no need to call sync
-    conn.pragma_update(None, "synchronous", &0 as &dyn ToSql)
+    conn.pragma_update(None, "synchronous", &"OFF" as &dyn ToSql)
         .unwrap();
 
     // reduce locks and unlocks
@@ -57,33 +74,12 @@ fn set_pragmas(conn: &Connection) {
         .unwrap();
 }
 
-fn init_db() -> Rc<Connection> {
-    let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(DEFAULT_MOUNTED_DB_ID)));
-
-    // dedicate a virtual memory to the database file
-    ic_wasi_polyfill::mount_memory_file(DB_FILE_NAME, Box::new(memory));
-
-    // remove lock if it exists
-    let _ = std::fs::remove_dir_all(format!("{DB_FILE_NAME}.lock"));
-
-    // Create a new connection to the file
-    let conn = rusqlite::Connection::open(DB_FILE_NAME).expect("Failed opening the database!");
-
-    // set pragmas
-    set_pragmas(&conn);
-
-    CONNECTION.with_borrow_mut(|c| {
-        *c = Some(Rc::new(conn));
-    });
-
-    CONNECTION.with_borrow(|c| c.clone().unwrap())
-}
-
-/// Use this function to get a new active connection to the database
-pub fn get_connection() -> Rc<Connection> {
-    if let Some(conn) = CONNECTION.with_borrow(|c| c.clone()) {
-        Rc::clone(&conn)
-    } else {
-        init_db()
-    }
+pub fn with_connection<F, R>(f: F) -> R
+where
+    F: FnOnce(RefMut<'_, Connection>) -> R,
+{
+    CONNECTION.with(|conn| {
+        let conn_mut = conn.borrow_mut(); // RefMut<Connection>
+        f(conn_mut)
+    })
 }

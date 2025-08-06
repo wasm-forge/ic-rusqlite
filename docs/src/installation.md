@@ -25,10 +25,10 @@ export PATH=$WASI_SDK/bin:$PATH
 
 Run `clang --version` to see that the correct compiler is available.
 
-Finally, install the (`wasi2ic`)[https://github.com/wasm-forge/wasi2ic]:
+Finally, install the [`wasi2ic`](https://github.com/wasm-forge/wasi2ic):
 ```bash
 cargo install wasi2ic
 ```
 
-This tool (rewires a WASI binary)[https://www.youtube.com/watch?v=oQb5TUiby7Q] and replaces calls to WASI functions with the corresponding IC function implementations.
+This tool [rewires a WASI binary](https://www.youtube.com/watch?v=oQb5TUiby7Q) and replaces calls to WASI functions with the corresponding IC function implementations.
 

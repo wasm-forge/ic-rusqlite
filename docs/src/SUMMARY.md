@@ -16,4 +16,4 @@
 - [Continuous Integration](ci.md)
 
 - [When is SQLite Appropriate?](usecases.md)
-- [Dos and Don'ts](does_and_donts.md)
+

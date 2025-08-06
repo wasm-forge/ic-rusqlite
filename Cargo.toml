@@ -1,6 +1,6 @@
 [package]
 name = "ic-rusqlite"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 keywords = ["internet-computer", "wasi", "sqlite"]
 description = "The project provides easy-to-use library to enable SQLite in your Internet Computer canister."
@@ -12,7 +12,7 @@ repository = "https://github.com/wasm-forge/ic-rusqlite"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-candid = "0.10.14"
+candid = "0.10.17"
 ic-cdk = "0.18.3"
 hex = "0.4.3"
 serde = "1.0.164"

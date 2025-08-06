@@ -1,1 +1,1 @@
-# Continuous integration
+# Continuous Integration

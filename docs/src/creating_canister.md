@@ -39,7 +39,7 @@ Example `dfx.json`:
 
 ## Accessing the Database
 
-Internally, the `ic_rusqlite` uses (stable structures)[https://github.com/dfinity/stable-structures]. The database connection is established with the first call to `ic_rusqlite::get_connection()`. You don't need to explicitly create the database or the memory manager, unless you also use other stable structures in your build. The virtual memories `200..210` are used for the canister's file system, and the virtual memory `120` is used as a storage for the database file.
+Internally, the `ic_rusqlite` uses [stable structures](https://github.com/dfinity/stable-structures). The database connection is established with the first call to `ic_rusqlite::get_connection()`. You don't need to explicitly create the database or the memory manager, unless you also use other stable structures in your build. The virtual memories `200..210` are used for the canister's file system, and the virtual memory `120` is used as a storage for the database file.
 
 ```admonish note
 Mounting a virtual memory onto a file is a special feature of [`stable-fs`](https://github.com/wasm-forge/stable-fs) that makes I/O operations with that file faster.
@@ -54,6 +54,6 @@ The `ic-rusqlite` uses `ic-wasi-polyfill`, this allows you to also use a file sy
 You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.
 
 ```admonish warning title="Use Memory Manager"
-Make sure **you are using the memory manager**(https://docs.rs/ic-stable-structures/latest/ic_stable_structures/#example-canister) or you will destroy the database and the file system stored in the stable memory.
+Make sure [**you are using the memory manager**](https://docs.rs/ic-stable-structures/latest/ic_stable_structures/#example-canister) or you will destroy the database and the file system stored in the stable memory.
 ```
 
