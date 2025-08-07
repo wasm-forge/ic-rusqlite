@@ -43,7 +43,6 @@ if [[ "$1" == "--sdk" ]]; then
   exit 0
 fi
 
-
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
 if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]] ||
@@ -56,6 +55,11 @@ else
     exit 1
 fi
 
+##################################
+############# add wasm32-wasi target
+
+echo "Installing wasm32-wasip1 target..."
+rustup target add wasm32-wasip1
 
 ##################################
 ############# install wasi2ic
@@ -79,9 +83,8 @@ if [ ! -d "$WASI_SDK" ]; then
     [ -f "$SDK_DIR/wasi-sdk.tar.gz" ] && rm "$SDK_DIR/wasi-sdk.tar.gz"
 
 else
-    echo "WASI_SDK found in: $WASI_SDK ..."
+    echo "WASI-SDK found in: $WASI_SDK ..."
 fi
-
 
 ##################################
 ############# Update .bashrc
