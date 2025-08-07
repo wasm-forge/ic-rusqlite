@@ -30,5 +30,5 @@ Following [pragma](https://sqlite.org/pragma.html) settings are set in `ic-rusql
 The pragma settings can be adjusted with SQL queries, you might want to do that during the `init` or the `post_upgrade` events:
 
 ```sql
-    PRAGMA cache_size=1000; -- Reduce DB cache size to free more memory
+    PRAGMA cache_size=1000; -- Reduce the maximum DB cache size
 ```

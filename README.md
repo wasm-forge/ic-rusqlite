@@ -17,7 +17,7 @@ export PATH=$WASI_SDK/bin:$PATH
 ```
 
 You can automate this by launching the preparation script:
-```bash
+```sh
 curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh | sh
 ```
 
@@ -60,33 +60,33 @@ Example:
 
 ## Example use in your Rust code
 
-Finally, use the `get_connection()` function to access your database:
+Finally, use the `with_connection()` function to access your database:
 
 ```rust
     //...
     
-    // get connection to the database
-    let conn = ic_rusqlite::get_connection();
+    with_connection(|conn| {
+      conn.execute(
+          "CREATE TABLE person (
+              id    INTEGER PRIMARY KEY,
+              name  TEXT NOT NULL,
+              data  BLOB
+          )",
+          (),
+      )?;
 
-    conn.execute(
-        "CREATE TABLE person (
-            id    INTEGER PRIMARY KEY,
-            name  TEXT NOT NULL,
-            data  BLOB
-        )",
-        (),
-    )?;
+      let data: Option<Vec<u8>> = None;
 
-    let data: Option<Vec<u8>> = None;
+      conn.execute(
+          "INSERT INTO person (name, data) VALUES (?1, ?2)",
+          ("Steven", &data),
+      )?;
 
-    conn.execute(
-        "INSERT INTO person (name, data) VALUES (?1, ?2)",
-        ("Steven", &data),
-    )?;
+    })
+
 
     //...
 ```
-
 
 You can find a small example in the `"examples/backend"` folder.
 
