@@ -35,9 +35,9 @@ else
 fi
 
 
-export WASI_FILE=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
-export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-x86_64-linux
-export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_FILE.tar.gz
+export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
+export WASI_SDK=$SDK_DIR/$WASI_DIR
+export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
 if [[ $OS == "linux" && "$ARCH" == "x86_64" ]]; then
 
