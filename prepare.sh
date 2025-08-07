@@ -43,9 +43,9 @@ if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]] ||
    [[ "$OS" == "linux" && "$ARCH" == "arm64" ]] ||
    [[ "$OS" == "macos" && "$ARCH" == "x86_64" ]] ||
    [[ "$OS" == "macos" && "$ARCH" == "arm64" ]]; then
-    echo "✅ Detected supported platform: $ARCH-$OS"
+    echo "✅ Detected supported platform: $OS-$ARCH"
 else
-    echo "❌ Unsupported OS/Architecture combination: $ARCH-$OS"
+    echo "❌ Unsupported OS/Architecture combination: $OS-$ARCH"
     exit 1
 fi
 
@@ -68,7 +68,7 @@ if [ ! -d "$WASI_SDK" ]; then
 
     tar -xzf $SDK_DIR/wasi-sdk.tar.gz -C $SDK_DIR
 
-    [-f "$SDK_DIR/wasi-sdk.tar.gz"] && rm "$SDK_DIR/wasi-sdk.tar.gz"
+    [ -f "$SDK_DIR/wasi-sdk.tar.gz" ] && rm "$SDK_DIR/wasi-sdk.tar.gz"
 
 else
     echo "WASI_SDK found in: $WASI_SDK ..."
