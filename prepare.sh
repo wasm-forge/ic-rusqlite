@@ -14,25 +14,38 @@ export OS=`uname -s`
 export ARCH=`uname -m`
 
 
-if [[ $OS == "Linux" && "$ARCH" == "x86_64" ]]; then
+# Normalize OS names
+if [[ "$OS" == "Darwin" ]]; then
+    OS="macos"
+elif [[ "$OS" == "Linux" ]]; then
+    OS="linux"
+else
+    echo "Unsupported OS: $OS"
+    exit 1
+fi
 
-    export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-x86_64-linux.tar.gz
-    export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-x86_64-linux
+# Normalize architecture names
+if [[ "$ARCH" == "x86_64" ]]; then
+    ARCH="x86_64"
+elif [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+    ARCH="arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
 
-elif [[ $OS == "Linux" && "$ARCH" == "aarch64" ]]; then
 
-    export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-arm64-linux.tar.gz
-    export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-arm64-linux
+export WASI_FILE=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
+export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-x86_64-linux
+export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_FILE.tar.gz
 
-elif [[ $OS == "Darwin" && "$ARCH" == "x86_64" ]]; then
+if [[ $OS == "linux" && "$ARCH" == "x86_64" ]]; then
 
-    export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-x86_64-macos.tar.gz
-    export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-x86_64-macos
+elif [[ $OS == "linux" && "$ARCH" == "arm64" ]]; then
 
-elif [[ $OS == "Darwin" && "$ARCH" == "aarch64" ]]; then
+elif [[ $OS == "macos" && "$ARCH" == "x86_64" ]]; then
 
-    export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-arm64-macos.tar.gz
-    export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-arm64-macos
+elif [[ $OS == "macos" && "$ARCH" == "arm64" ]]; then
 
 else
     echo "❌ Unsupported OS/Architecture combination: $OS $ARCH"
