@@ -23,7 +23,7 @@ export PATH=$WASI_SDK/bin:$PATH
 
 You can automate this by launching the preparation script:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh -o prepare.sh | source prepare.sh
+curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh | sh
 ```
 
 

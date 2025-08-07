@@ -113,11 +113,11 @@ if [ -n "$FOUND1" ] && [ -n "$FOUND2" ]; then
 fi
 
 AUTO_CONFIRM=false
-if [ "$1" == "-y" ] || [ "$1" == "--yes" ]; then
+if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
   AUTO_CONFIRM=true
 fi
 
-if $AUTO_CONFIRM; then
+if [ "$AUTO_CONFIRM" = "true" ]; then
   RESPONSE="Y"
 else
   printf "Do you want to update yor .bashrc? [y/N] " 
