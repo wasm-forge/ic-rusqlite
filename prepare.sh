@@ -37,6 +37,13 @@ fi
 
 export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
 export WASI_SDK=$SDK_DIR/$WASI_DIR
+
+if [[ "$1" == "--sdk" ]]; then
+  echo $WASI_SDK
+  exit 0
+fi
+
+
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
 if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]] ||
@@ -48,6 +55,7 @@ else
     echo "❌ Unsupported OS/Architecture combination: $OS-$ARCH"
     exit 1
 fi
+
 
 ##################################
 ############# install wasi2ic

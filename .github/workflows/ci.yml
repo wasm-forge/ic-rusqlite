@@ -36,7 +36,14 @@ jobs:
           rustup target add wasm32-wasip1
 
       - name: Download WASI-SDK and wasi2ic
-        run: ./prepare.sh -y
+        run: |
+          ./prepare.sh -y
+
+          export WASI_SDK=`./prepare.sh --sdk`
+
+          echo "WASI_SDK=$WASI_SDK" >> $GITHUB_ENV
+
+          echo "$WASI_SDK/bin" >> $GITHUB_PATH
           
       - name: Check clang install
         run: |
