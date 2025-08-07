@@ -88,6 +88,9 @@ Finally, use the `with_connection()` function to access your database:
     //...
 ```
 
+## Further examples
+
 You can find a small example in the `"examples/backend"` folder.
 
+For more detailed explanations, see the [`ic-rusqlite` book](https://wasm-forge.github.io/ic-rusqlite/).
 
