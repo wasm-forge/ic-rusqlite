@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 
 # It is assumed you have Rust and DFX installed...
@@ -14,11 +14,12 @@ export SDK_DIR=$HOME/.cache/wasi-sdk
 export OS=`uname -s`
 export ARCH=`uname -m`
 
+echo "Checkiong OS/Architecture combination: $OS-$ARCH"
 
 # Normalize OS names
-if [[ "$OS" == "Darwin" ]]; then
+if [ "$OS" = "Darwin" ]; then
     OS="macos"
-elif [[ "$OS" == "Linux" ]]; then
+elif [ "$OS" = "Linux" ]; then
     OS="linux"
 else
     echo "Unsupported OS: $OS"
@@ -26,9 +27,9 @@ else
 fi
 
 # Normalize architecture names
-if [[ "$ARCH" == "x86_64" ]]; then
+if [ "$ARCH" = "x86_64" ]; then
     ARCH="x86_64"
-elif [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
     ARCH="arm64"
 else
     echo "Unsupported architecture: $ARCH"
@@ -46,10 +47,10 @@ fi
 
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
-if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]] ||
-   [[ "$OS" == "linux" && "$ARCH" == "arm64" ]] ||
-   [[ "$OS" == "macos" && "$ARCH" == "x86_64" ]] ||
-   [[ "$OS" == "macos" && "$ARCH" == "arm64" ]]; then
+if { [ "$OS" = "linux" && "$ARCH" = "x86_64" ]; } ||
+   { [ "$OS" = "linux" && "$ARCH" = "arm64" ]; } ||
+   { [ "$OS" = "macos" && "$ARCH" = "x86_64" ]; } ||
+   { [ "$OS" = "macos" && "$ARCH" = "arm64" ]; }; then
     echo "✅ Detected supported platform: $OS-$ARCH"
 else
     echo "❌ Unsupported OS/Architecture combination: $OS-$ARCH"
@@ -75,13 +76,13 @@ if [ ! -d "$WASI_SDK" ]; then
 
     echo "Downloading WASI-SDK..."
     
-    mkdir -p $SDK_DIR
+    mkdir -p "$SDK_DIR"
 
-    curl -L -o $SDK_DIR/wasi-sdk.tar.gz $SRC
+    curl -L -o "$SDK_DIR/wasi-sdk.tar.gz" "$SRC"
 
     echo "Extracting tar..."
 
-    tar -xzf $SDK_DIR/wasi-sdk.tar.gz -C $SDK_DIR
+    tar -xzf "$SDK_DIR/wasi-sdk.tar.gz" -C "$SDK_DIR"
 
     echo "Deleting download..."
 
@@ -96,51 +97,52 @@ fi
 ##################################
 ############# Update .bashrc
 
+BASHRC="$HOME/.bashrc"
+
+echo "Preparing .bashrc update..."
+
 CONFIG_LINES=(
   "export WASI_SDK=$WASI_SDK"
   'export PATH="$WASI_SDK/bin:$PATH"'
 )
 
-BASHRC="$HOME/.bashrc"
+line1="export WASI_SDK=$WASI_SDK"
+line2='export PATH=$WASI_SDK/bin:$PATH'
 
-# Check which lines are missing
-missing_lines=()
-for line in "${CONFIG_LINES[@]}"; do
-  if ! grep -Fxq "$line" "$BASHRC"; then
-    missing_lines+=("$line")
-  fi
-done
+FOUND1=`grep -F "$line1" "$BASHRC" 2>/dev/null || true`
+FOUND2=`grep -F "$line2" "$BASHRC" 2>/dev/null || true`
 
-if [ ${#missing_lines[@]} -eq 0 ]; then
-  echo "✅ .bashrc is ready"
-  exit 0
+if [ -n "$FOUND1" ] && [ -n "$FOUND2" ]; then
+    echo "✅ .bashrc is ready"
+    exit 0
 fi
 
 AUTO_CONFIRM=false
-if [[ "$1" == "-y" || "$1" == "--yes" ]]; then
+if [ "$1" == "-y"] || ["$1" == "--yes" ]; then
   AUTO_CONFIRM=true
 fi
 
 if $AUTO_CONFIRM; then
   RESPONSE="Y"
 else
-  read -p "Do you want to update yor .bashrc? [y/N] " RESPONSE
+  printf "Do you want to update yor .bashrc? [y/N] " 
+  read RESPONSE
 fi
 
-if [[ "$RESPONSE" =~ ^[Yy]$ ]]; then
-  for line in "${CONFIG_LINES[@]}"; do
-    echo "$line" >> "$BASHRC"
-  done
-  echo "" >> "$BASHRC"
 
-  echo "✅ .bashrc updated"
+case "$RESPONSE" in
+  y|Y)
+    echo "$line1" >> "$BASHRC"
+    echo "$line2" >> "$BASHRC"
+    echo "" >> "$BASHRC"
+    echo "✅ .bashrc updated"
+    echo "Restart your shell for the changes to take effect..."
+    ;;
+  *)
+    echo "ℹ️ Skipped modifying .bashrc"
+    echo 'To enable compilation, make sure you point $WASI_SDK to the WASI-SDK installation and ensure the WASI-oriented clang compiler is available on the PATH:'
+    echo "$line1"
+    echo "$line2"
+    ;;
+esac
 
-  echo "Restart your shell for the changes to take effect..."
-
-else
-  echo "ℹ️ Skipped modifying .bashrc,"
-  echo 'To enable compilation, make sure you point $WASI_SDK to wasi-sdk installation and the wasi-oriented clang compiler is available on the path:'
-  echo "export WASI_SDK=$WASI_SDK"
-  echo 'export PATH=$WASI_SDK/bin'
-
-fi

@@ -8,27 +8,22 @@
 
 ## Setting Up the Environment
 
-Install the WASI target:
-```bash
-rustup target add wasm32-wasip1
-```
+It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/) installed.
 
-The SQLite written in C, to compile it you will need the [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases).
+To compile a project with `ic-rusqlite` dependency, you will need to:
 
-The `*.deb` package will install into `/opt/wasi-sdk` by default. You can choose any other folder if you download a `*.tar.gz` file.
-
-Add these commands to your canister project `build.sh` script or `.bashrc` to automate:
+- install wasi2ic: `cargo install wasi2ic`
+- install WASI target: `rustup target add wasm32-wasip1`
+- install WASI-SDK and WASI-oriented clang: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
+- Finally, set the `WASI_SDK` and `PATH`:
 ```bash
 export WASI_SDK=/opt/wasi-sdk
 export PATH=$WASI_SDK/bin:$PATH
 ```
 
-Run `clang --version` to see that the correct compiler is available.
-
-Finally, install the [`wasi2ic`](https://github.com/wasm-forge/wasi2ic):
+You can automate this by launching the preparation script:
 ```bash
-cargo install wasi2ic
+curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh -o prepare.sh | source prepare.sh
 ```
 
-This tool [rewires a WASI binary](https://www.youtube.com/watch?v=oQb5TUiby7Q) and replaces calls to WASI functions with the corresponding IC function implementations.
 
