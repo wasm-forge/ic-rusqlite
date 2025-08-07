@@ -14,8 +14,6 @@ SDK_DIR="$HOME/.cache/wasi-sdk"
 OS=`uname -s`
 ARCH=`uname -m`
 
-echo "Checking OS/Architecture combination: $OS-$ARCH"
-
 # Normalize OS names
 if [ "$OS" = "Darwin" ]; then
     OS="macos"
@@ -44,6 +42,8 @@ if [ "$1" = "--sdk" ]; then
   echo $WASI_SDK
   exit 0
 fi
+
+echo "Checking OS/Architecture combination: $OS-$ARCH"
 
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
