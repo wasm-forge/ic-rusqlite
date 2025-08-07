@@ -41,7 +41,7 @@ elif [[ $OS == "macOS" && "$ARCH" == "aarch64" ]]; then
     export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-arm64-macos
 
 else
-    echo "Unsupported OS/Architecture combination"
+    echo "Unsupported OS/Architecture combination: $OS $ARCH"
     exit 1
 fi
 
