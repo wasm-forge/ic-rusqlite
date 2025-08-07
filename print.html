@@ -3,13 +3,13 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>ic-test</title>
+        <title>Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</title>
         <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
 
-        <meta name="description" content="Documentation for the ic-test utility">
+        <meta name="description" content="Documentation for the &#x60;ic-rusqlite&#x60; convenience package">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
@@ -125,13 +125,13 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">ic-test</h1>
+                    <h1 class="menu-title">Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/wasm-forge/ic-test" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/wasm-forge/ic-rusqlite" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
 
@@ -362,6 +362,7 @@ CREATE TABLE orders (
 <p>Download and unzip the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a>.</p>
 <p>...</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="long-update-or-query-calls"><a class="header" href="#long-update-or-query-calls">Long update or query calls</a></h1>
+<p>Pagination and other techniques to deal with large databasets.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pagination"><a class="header" href="#pagination">Pagination</a></h1>
 <p>To avoid running out of instructions and the returned data size on potentially large datasets, it is possible to limit the number of data rows returned by the SQL query. Use <code>LIMIT &lt;N&gt;</code> to limit the number of rows returned by a query, and <code>OFFSET &lt;N&gt;</code> to skip the first <code>N</code> rows of a responce.</p>
 <p>To return at most 5 persons and skip the first 3:</p>
@@ -391,7 +392,10 @@ CREATE TABLE orders (
 <pre><code class="language-sql">    PRAGMA cache_size=1000; -- Reduce the maximum DB cache size
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="backup-and-recover"><a class="header" href="#backup-and-recover">Backup and recover</a></h1>
+<p>Backup and restore via ic-link
+...</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="continuous-integration"><a class="header" href="#continuous-integration">Continuous Integration</a></h1>
+<p>Explore, how can we develop and modify the database in the canister.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="when-is-sqlite-appropriate"><a class="header" href="#when-is-sqlite-appropriate">When is SQLite appropriate?</a></h1>
 
                     </main>
