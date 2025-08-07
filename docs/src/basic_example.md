@@ -59,3 +59,4 @@ fn init() {
 ```
 
 For a complete picture of what you can accomplish with a `Connection`, see the [**rusqlite** documentation](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html).
+
