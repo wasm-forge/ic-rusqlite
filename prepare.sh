@@ -39,16 +39,13 @@ export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
 export WASI_SDK=$SDK_DIR/$WASI_DIR
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
-if [[ $OS == "linux" && "$ARCH" == "x86_64" ]]; then
-
-elif [[ $OS == "linux" && "$ARCH" == "arm64" ]]; then
-
-elif [[ $OS == "macos" && "$ARCH" == "x86_64" ]]; then
-
-elif [[ $OS == "macos" && "$ARCH" == "arm64" ]]; then
-
+if [[ "$OS" == "linux" && "$ARCH" == "x86_64" ]] ||
+   [[ "$OS" == "linux" && "$ARCH" == "arm64" ]] ||
+   [[ "$OS" == "macos" && "$ARCH" == "x86_64" ]] ||
+   [[ "$OS" == "macos" && "$ARCH" == "arm64" ]]; then
+    echo "✅ Detected supported platform: $ARCH-$OS"
 else
-    echo "❌ Unsupported OS/Architecture combination: $OS $ARCH"
+    echo "❌ Unsupported OS/Architecture combination: $ARCH-$OS"
     exit 1
 fi
 
