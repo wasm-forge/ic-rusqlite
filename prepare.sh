@@ -10,7 +10,7 @@ set -e
 
 export SDK_DIR=$HOME/.cache/wasi-sdk
 export SDK_VERSION=27
-export OS=`uname`
+export OS=`uname -s`
 export ARCH=`uname -m`
 
 
@@ -24,18 +24,18 @@ elif [[ $OS == "Linux" && "$ARCH" == "aarch64" ]]; then
     export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-arm64-linux.tar.gz
     export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-arm64-linux
 
-elif [[ $OS == "macOS" && "$ARCH" == "x86_64" ]]; then
+elif [[ $OS == "Darwin" && "$ARCH" == "x86_64" ]]; then
 
     export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-x86_64-macos.tar.gz
     export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-x86_64-macos
 
-elif [[ $OS == "macOS" && "$ARCH" == "aarch64" ]]; then
+elif [[ $OS == "Darwin" && "$ARCH" == "aarch64" ]]; then
 
     export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/wasi-sdk-$SDK_VERSION.0-arm64-macos.tar.gz
     export WASI_SDK=$SDK_DIR/wasi-sdk-$SDK_VERSION.0-arm64-macos
 
 else
-    echo "Unsupported OS/Architecture combination: $OS $ARCH"
+    echo "❌ Unsupported OS/Architecture combination: $OS $ARCH"
     exit 1
 fi
 
