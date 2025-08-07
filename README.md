@@ -6,29 +6,20 @@ This is a convenience package to create a canister with the Sqlite support.
 
 It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
 
-The WASI preview1 target for Rust will be used:
+To compile a project with this dependency, you will need to:
+- install wasi2ic: `cargo install wasi2ic`
+- install WASI target: `rustup target add wasm32-wasip1`
+- install WASI-SDK and WASI-oriented clang: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
+- Finally, set the `WASI_SDK` and `PATH`:
 ```bash
-rustup target add wasm32-wasip1
+  export WASI_SDK=/opt/wasi-sdk
+  export PATH=$WASI_SDK/bin:$PATH
 ```
 
-You need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
-Once installed the `clang` compiler should be available from the path `/opt/wasi-sdk/bin/`. 
-
-If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK`:
+You can automate this by simply launching the preparation script:
 ```bash
-export WASI_SDK=/opt/wasi-sdk
+  curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh -o prepare.sh | source prepare.sh
 ```
-
-You will also need to make sure the `clang` is found and `WASI_SYSROOT` is specified:
-```bash
-export PATH=$WASI_SDK/bin:$PATH
-```
-
-Finally, install the `wasi2ic` tool:
-```bash
-cargo install wasi2ic
-```
-
 
 
 ## Developing casniter

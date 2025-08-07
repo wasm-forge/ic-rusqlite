@@ -8,8 +8,9 @@ set -e
 ##################################
 ############# prepare VARs
 
-export SDK_DIR=$HOME/.cache/wasi-sdk
 export SDK_VERSION=27
+
+export SDK_DIR=$HOME/.cache/wasi-sdk
 export OS=`uname -s`
 export ARCH=`uname -m`
 
@@ -56,7 +57,7 @@ else
 fi
 
 ##################################
-############# add wasm32-wasi target
+############# add wasm32-wasip1 target
 
 echo "Installing wasm32-wasip1 target..."
 rustup target add wasm32-wasip1
@@ -78,13 +79,19 @@ if [ ! -d "$WASI_SDK" ]; then
 
     curl -L -o $SDK_DIR/wasi-sdk.tar.gz $SRC
 
+    echo "Extracting tar..."
+
     tar -xzf $SDK_DIR/wasi-sdk.tar.gz -C $SDK_DIR
+
+    echo "Deleting download..."
 
     [ -f "$SDK_DIR/wasi-sdk.tar.gz" ] && rm "$SDK_DIR/wasi-sdk.tar.gz"
 
+    echo "✅ WASI-SDK installed in: $WASI_SDK ..."
 else
-    echo "WASI-SDK found in: $WASI_SDK ..."
+    echo "✅ WASI-SDK found in: $WASI_SDK ..."
 fi
+
 
 ##################################
 ############# Update .bashrc
@@ -128,12 +135,12 @@ if [[ "$RESPONSE" =~ ^[Yy]$ ]]; then
 
   echo "✅ .bashrc updated"
 
-  source ~/.bashrc
+  echo "Restart your shell for the changes to take effect..."
 
 else
   echo "ℹ️ Skipped modifying .bashrc,"
   echo 'To enable compilation, make sure you point $WASI_SDK to wasi-sdk installation and the wasi-oriented clang compiler is available on the path:'
-  echo 'export WASI_SDK=/opt/wasi-sdk'
+  echo "export WASI_SDK=$WASI_SDK"
   echo 'export PATH=$WASI_SDK/bin'
 
 fi
