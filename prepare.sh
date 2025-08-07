@@ -6,13 +6,7 @@
 set -e
 
 ##################################
-############# install wasi2ic
-
-echo "Installing wasi2ic..."
-cargo install wasi2ic
-
-##################################
-############# download WASI-SDK
+############# prepare VARs
 
 export SDK_DIR=$HOME/.cache/wasi-sdk
 export SDK_VERSION=27
@@ -45,6 +39,14 @@ else
     exit 1
 fi
 
+##################################
+############# install wasi2ic
+
+echo "Installing wasi2ic..."
+cargo install wasi2ic
+
+##################################
+############# download WASI-SDK
 
 if [ ! -d "$WASI_SDK" ]; then
 
