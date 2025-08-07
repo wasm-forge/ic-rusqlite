@@ -8,13 +8,13 @@ set -e
 ##################################
 ############# prepare VARs
 
-export SDK_VERSION=27
+SDK_VERSION=27
 
-export SDK_DIR=$HOME/.cache/wasi-sdk
-export OS=`uname -s`
-export ARCH=`uname -m`
+SDK_DIR="$HOME/.cache/wasi-sdk"
+OS=`uname -s`
+ARCH=`uname -m`
 
-echo "Checkiong OS/Architecture combination: $OS-$ARCH"
+echo "Checking OS/Architecture combination: $OS-$ARCH"
 
 # Normalize OS names
 if [ "$OS" = "Darwin" ]; then
@@ -36,21 +36,21 @@ else
     exit 1
 fi
 
-
+  
 export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
 export WASI_SDK=$SDK_DIR/$WASI_DIR
 
-if [[ "$1" == "--sdk" ]]; then
+if [ "$1" = "--sdk" ]; then
   echo $WASI_SDK
   exit 0
 fi
 
 export SRC=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-$SDK_VERSION/$WASI_DIR.tar.gz
 
-if { [ "$OS" = "linux" && "$ARCH" = "x86_64" ]; } ||
-   { [ "$OS" = "linux" && "$ARCH" = "arm64" ]; } ||
-   { [ "$OS" = "macos" && "$ARCH" = "x86_64" ]; } ||
-   { [ "$OS" = "macos" && "$ARCH" = "arm64" ]; }; then
+if { [ "$OS" = "linux" ] && [ "$ARCH" = "x86_64" ]; } ||
+   { [ "$OS" = "linux" ] && [ "$ARCH" = "arm64" ]; } ||
+   { [ "$OS" = "macos" ] && [ "$ARCH" = "x86_64" ]; } ||
+   { [ "$OS" = "macos" ] && [ "$ARCH" = "arm64" ]; }; then
     echo "✅ Detected supported platform: $OS-$ARCH"
 else
     echo "❌ Unsupported OS/Architecture combination: $OS-$ARCH"
@@ -101,11 +101,6 @@ BASHRC="$HOME/.bashrc"
 
 echo "Preparing .bashrc update..."
 
-CONFIG_LINES=(
-  "export WASI_SDK=$WASI_SDK"
-  'export PATH="$WASI_SDK/bin:$PATH"'
-)
-
 line1="export WASI_SDK=$WASI_SDK"
 line2='export PATH=$WASI_SDK/bin:$PATH'
 
@@ -118,7 +113,7 @@ if [ -n "$FOUND1" ] && [ -n "$FOUND2" ]; then
 fi
 
 AUTO_CONFIRM=false
-if [ "$1" == "-y"] || ["$1" == "--yes" ]; then
+if [ "$1" == "-y" ] || [ "$1" == "--yes" ]; then
   AUTO_CONFIRM=true
 fi
 
