@@ -159,7 +159,54 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="when-is-sqlite-appropriate"><a class="header" href="#when-is-sqlite-appropriate">When is SQLite appropriate?</a></h1>
+                        <h1 id="when-is-sqlite-appropriate"><a class="header" href="#when-is-sqlite-appropriate">When Is SQLite Appropriate?</a></h1>
+<p>SQLite is a fast, lightweight SQL database that stores all data in a single file. This works well with a canister's memory model, but there are pros and cons to consider before choosing it.</p>
+<h2 id="when-to-use-sqlite"><a class="header" href="#when-to-use-sqlite">When to Use SQLite</a></h2>
+<p>SQLite is ideal when you need structured, reliable, and transactional data storage but don’t want the complexity of running a database server.</p>
+<ul>
+<li>
+<p><strong>You need complex queries.</strong>
+SQLite supports standard SQL, allowing you to perform advanced queries using <code>SELECT</code>, <code>JOIN</code>, <code>GROUP BY</code>, and other operations.</p>
+</li>
+<li>
+<p><strong>You need transactions.</strong>
+SQLite is ACID-compliant, so it guarantees data consistency, supports rollback, and handles multi-step operations safely.</p>
+</li>
+</ul>
+<h2 id="when-to-use-stable-structures"><a class="header" href="#when-to-use-stable-structures">When to Use Stable Structures</a></h2>
+<p>If your data needs are simple, stable structures may be faster and easier to use.</p>
+<p><strong>Use a stable structure like <code>Vec</code>, <code>BTreeMap</code>, or <code>BTreeSet</code> when:</strong></p>
+<ul>
+<li>
+<p><strong>You don’t need transactions.</strong>
+If you don’t need rollback or atomic updates.</p>
+</li>
+<li>
+<p><strong>You don’t need SQL-style queries.</strong>
+For simple lookups, sorting, or iteration, stable data structures are faster and easier to work with.</p>
+</li>
+<li>
+<p><strong>You need speed over flexibility.</strong>
+Structures like <code>Vec</code> provide O(1) index-based access, and <code>BTreeMap</code> gives sorted access with logarithmic complexity — both faster than SQLite for many common tasks.</p>
+</li>
+</ul>
+<h2 id="when-to-use-the-file-system"><a class="header" href="#when-to-use-the-file-system">When to Use the File System</a></h2>
+<p>For file-based hierarchical data, the file system may be the best choice.</p>
+<p><strong>Use the file system storage when:</strong></p>
+<ul>
+<li>
+<p><strong>You want to organize data into directories and subfolders.</strong>
+Storing backups and documents.</p>
+</li>
+<li>
+<p><strong>You work with large data.</strong>
+Files are larger than the canister's heap memory and/or contain large sections of zeroed memory (sparce files).</p>
+</li>
+<li>
+<p><strong>You perform byte-level data manipulation.</strong>
+Editing or seeking within large files is faster with standard file I/O than loading and modifying data through an SQL database.</p>
+</li>
+</ul>
 
                     </main>
 

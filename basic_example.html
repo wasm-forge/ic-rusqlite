@@ -204,11 +204,11 @@ fn init() {
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS person (
-            id    INTEGER PRIMARY KEY,
-            name  TEXT NOT NULL,
-            data  TEXT,
-            age   INTEGER
-         )",
+                id    INTEGER PRIMARY KEY,
+                name  TEXT NOT NULL,
+                data  TEXT,
+                age   INTEGER
+            )",
             (),
         )
         .unwrap();

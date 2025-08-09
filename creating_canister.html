@@ -192,7 +192,8 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 }
 </code></pre>
 <h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the Database</a></h2>
-<p>Internally, the <code>ic_rusqlite</code> uses <a href="https://github.com/dfinity/stable-structures">stable structures</a>. The database connection is established with the first call to <code>ic_rusqlite::get_connection()</code>. You don't need to explicitly create the database or the memory manager, unless you also use other stable structures in your build. The virtual memories <code>200..210</code> are used for the canister's file system, and the virtual memory <code>120</code> is used as a storage for the database file.</p>
+<p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so you don't need to explicitly initialize or create the database.</p>
+<p>Internally, the <code>ic_rusqlite</code> depends on the <code>ic-wasi-polyfill</code> library, which is backed up by the <code>stable-fs</code> storage. The <code>stable-fs</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system, and the virtual memory with the ID <code>120</code> is storing the database.</p>
 <div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
 <div id="admonition-note-title">
@@ -201,11 +202,12 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <a class="admonition-anchor-link" href="#admonition-note"></a>
 </div>
 <div>
-<p>Mounting a virtual memory onto a file is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a> that makes I/O operations with that file faster.</p>
+<p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast .</p>
 </div>
 </div>
 <h2 id="using-file-system"><a class="header" href="#using-file-system">Using File System</a></h2>
-<p>The <code>ic-rusqlite</code> uses <code>ic-wasi-polyfill</code>, this allows you to also use a file system. You can read or write files with the standard Rust functions. The database is stored in root <code>/main.db</code>. In the current implementation you only have a single database file, which you access by calling <code>ic_rusqlite::get_connection()</code>.</p>
+<p>With the <code>ic-rusqlite</code> it is possible to use standart Rust I/O functions to create files.</p>
+<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>. A few additional files can be created by the SQLite engine:</p>
 <h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">

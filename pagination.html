@@ -162,7 +162,7 @@
                         <h1 id="pagination"><a class="header" href="#pagination">Pagination</a></h1>
 <p>To avoid running out of instructions and the returned data size on potentially large datasets, it is possible to limit the number of data rows returned by the SQL query. Use <code>LIMIT &lt;N&gt;</code> to limit the number of rows returned by a query, and <code>OFFSET &lt;N&gt;</code> to skip the first <code>N</code> rows of a responce.</p>
 <p>To return at most 5 persons and skip the first 3:</p>
-<pre><code class="language-sql">SELECT * LIMIT 5 OFFSET 3 FROM person
+<pre><code class="language-sql">SELECT * FROM person LIMIT 5 OFFSET 3
 </code></pre>
 
                     </main>

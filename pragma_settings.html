@@ -177,8 +177,8 @@
 - <code>MEMORY</code><br />
 - avoids creating temporary file on disk, saves extra I/O operations.</p>
 <p><em><a href="https://sqlite.org/pragma.html#cache_size">cache_size</a></em>
-- <code>1000000</code>
-- gives a significant performance boost at the expence of the canister's memory used.</p>
+- <code>500000</code>
+- set cache size to 4096 * 500000 bytes, this gives a significant performance boost at the expence of the canister's memory used.</p>
 <p>The pragma settings can be adjusted with SQL queries, you might want to do that during the <code>init</code> or the <code>post_upgrade</code> events:</p>
 <pre><code class="language-sql">    PRAGMA cache_size=1000; -- Reduce the maximum DB cache size
 </code></pre>
