@@ -23,8 +23,8 @@ Following [pragma](https://sqlite.org/pragma.html) settings are set in `ic-rusql
     - avoids creating temporary file on disk, saves extra I/O operations.
 
 *[cache_size](https://sqlite.org/pragma.html#cache_size)*
-    - `1000000`
-    - gives a significant performance boost at the expence of the canister's memory used.
+    - `500000`
+    - set cache size to 4096 * 500000 bytes, this gives a significant performance boost at the expence of the canister's memory used.
 
 
 The pragma settings can be adjusted with SQL queries, you might want to do that during the `init` or the `post_upgrade` events:

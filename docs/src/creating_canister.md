@@ -39,15 +39,19 @@ Example `dfx.json`:
 
 ## Accessing the Database
 
-Internally, the `ic_rusqlite` uses [stable structures](https://github.com/dfinity/stable-structures). The database connection is established with the first call to `ic_rusqlite::get_connection()`. You don't need to explicitly create the database or the memory manager, unless you also use other stable structures in your build. The virtual memories `200..210` are used for the canister's file system, and the virtual memory `120` is used as a storage for the database file.
+The database connection is established with the first call to `ic_rusqlite::with_connection(...)`, so you don't need to explicitly initialize or create the database.
+
+Internally, the `ic_rusqlite` depends on the `ic-wasi-polyfill` library, which is backed up by the `stable-fs` storage. The `stable-fs` uses [stable structures](https://dfinity.github.io/stable-structures/) with the [memory manager](https://dfinity.github.io/stable-structures/concepts/memory-manager.html). The virtual memories `101..119` are reserved for the file system, and the virtual memory with the ID `120` is storing the database.
 
 ```admonish note
-Mounting a virtual memory onto a file is a special feature of [`stable-fs`](https://github.com/wasm-forge/stable-fs) that makes I/O operations with that file faster.
+The ability to associate a file with a virtual memory is a special feature of [`stable-fs`](https://github.com/wasm-forge/stable-fs). This allows to create dedicated files with fast .
 ```
 
 ## Using File System
 
-The `ic-rusqlite` uses `ic-wasi-polyfill`, this allows you to also use a file system. You can read or write files with the standard Rust functions. The database is stored in root `/main.db`. In the current implementation you only have a single database file, which you access by calling `ic_rusqlite::get_connection()`.
+With the `ic-rusqlite` it is possible to use standart Rust I/O functions to create files.
+
+Currently, for technical reasons, the database is stored in the root folder: `/main.db`. A few additional files can be created by the SQLite engine: 
 
 ## Other Stable Structures
 

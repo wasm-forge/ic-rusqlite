@@ -4,6 +4,6 @@ To avoid running out of instructions and the returned data size on potentially l
 
 To return at most 5 persons and skip the first 3:
 ```sql
-SELECT * LIMIT 5 OFFSET 3 FROM person
+SELECT * FROM person LIMIT 5 OFFSET 3
 ```
 
