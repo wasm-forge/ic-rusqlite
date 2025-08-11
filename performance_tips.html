@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Backup and Recovery - Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</title>
+        <title>Performance Tips - Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</title>
 
 
         <!-- Custom HTML head -->
@@ -159,19 +159,85 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="backup-and-recover"><a class="header" href="#backup-and-recover">Backup and recover</a></h1>
-<p>Backup and restore via ic-link
-...</p>
+                        <h1 id="working-with-the-large-datasets"><a class="header" href="#working-with-the-large-datasets">Working with the Large Datasets</a></h1>
+<ul>
+<li><strong>Use indexed queries.</strong></li>
+</ul>
+<p>Plan ahead, which fields will be critical to search the right elements and create indexes on those fields. If you need to quickly find a person by <code>name</code>, make sure this <code>name</code> field is indexed:</p>
+<pre><code class="language-sql">CREATE INDEX IF NOT EXISTS idx_persons_name ON customers(name);
+</code></pre>
+<p>Plan ahead, how you store your data. If you store the <code>first_name</code> and the <code>last_name</code> concatinated in the same table column, it won't be possible to search by the <code>last_name</code> without a full table scan, eg. <code>... WHERE name LIKE '%Johnson'</code>.</p>
+<ul>
+<li><strong>Check Instructions passed to see if you want to quit early and bulk insertions.</strong></li>
+</ul>
+<ol>
+<li>You can process queries iteratively and check the timing constraints in the loop, if there is not enough time to finish the operation, exit eary with a limited amount of work done.</li>
+<li>Every call to <code>execute</code> causes transactions to open and close on each statement. If you open a transaction before inserting the first, the database will not commit untill you explicitly commit the changes:</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[ic_cdk::update]
+fn add_customers(id_offset: u64) {
+    let start = ic_instruction_counter();
+
+    with_connection(|mut conn| {
+        let tx = conn.transaction().unwrap();
+
+        let sql =
+            String::from("insert into customers (firstname, lastname, email) values (?, ?, ?)");
+
+        {
+            let mut stmt = tx.prepare_cached(&amp;sql).unwrap();
+
+            let mut i = 0;
+
+            // do as many rows as the timing allows
+            while i &lt; 100000000 {
+                let id = id_offset + i + 1;
+                let name = format!("{id}customer_name{id}");
+                let last_name = format!("{id}customer_last_name{id}");
+                let email = format!("{id}customer@example.com");
+
+                stmt.execute(ic_rusqlite::params![name, last_name, email])
+                    .expect("insert of a user failed!");
+
+                i += 1;
+
+                //
+                let end = ic_instruction_counter();
+                if end - start &gt; 20000000000 {
+                    break;
+                }
+            }
+        }
+
+        tx.commit().expect("COMMIT USER INSERTION FAILED!");
+    });
+}
+
+<span class="boring">}</span></code></pre></pre>
+<ul>
+<li><strong>Examine query plan.</strong></li>
+</ul>
+<p>To identify problems with a complex or slow query, study its <a href="https://www.sqlite.org/eqp.html">query plan</a>.
+See if there are any full scans on a table, you might want to change the query logic and/or introduce indexes.</p>
+<ul>
+<li><strong>Use pagination.</strong></li>
+</ul>
+<p>To avoid running out of instructions and the returned data size on potentially large datasets, it is possible to limit the number of data rows returned by the SQL query. Use <code>LIMIT &lt;N&gt;</code> to limit the number of rows returned by a query, and <code>OFFSET &lt;N&gt;</code> to skip the first <code>N</code> rows of a response.</p>
+<p>To return at most 5 persons and skip the first 3, write:</p>
+<pre><code class="language-sql">SELECT * FROM persons LIMIT 5 OFFSET 3
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="pragma_settings.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="large_database.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="ci.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="pragma_settings.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -181,11 +247,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="pragma_settings.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="large_database.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="ci.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="pragma_settings.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

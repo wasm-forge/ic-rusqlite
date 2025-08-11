@@ -202,12 +202,12 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <a class="admonition-anchor-link" href="#admonition-note"></a>
 </div>
 <div>
-<p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast .</p>
+<p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast I/O access.</p>
 </div>
 </div>
 <h2 id="using-file-system"><a class="header" href="#using-file-system">Using File System</a></h2>
 <p>With the <code>ic-rusqlite</code> it is possible to use standart Rust I/O functions to create files.</p>
-<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>. A few additional files can be created by the SQLite engine:</p>
+<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>, but a few additional helper files may be created by the SQLite engine.</p>
 <h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">

@@ -227,12 +227,12 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <a class="admonition-anchor-link" href="creating_canister.html#admonition-note"></a>
 </div>
 <div>
-<p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast .</p>
+<p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast I/O access.</p>
 </div>
 </div>
 <h2 id="using-file-system"><a class="header" href="#using-file-system">Using File System</a></h2>
 <p>With the <code>ic-rusqlite</code> it is possible to use standart Rust I/O functions to create files.</p>
-<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>. A few additional files can be created by the SQLite engine:</p>
+<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>, but a few additional helper files may be created by the SQLite engine.</p>
 <h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">
@@ -359,16 +359,123 @@ CREATE TABLE orders (
 <tr><td>Create 1M orders after indices were created</td><td>29.88 B</td></tr>
 <tr><td>Delete 100000 orders with transaction rollback: <code>BEGIN TRANSACTION; DELETE FROM orders WHERE order_id &gt; 900000; ROLLBACK</code></td><td>1.53 B</td></tr>
 </tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="large-database"><a class="header" href="#large-database">Large Database</a></h1>
-<p>Let's try creating a large database of size ...GB and see how it performns.</p>
-<p>Download and unzip the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a> from the <a href="https://www.sqlitetutorial.net">SQLite tutorial</a>.</p>
-<p>In your canister, create a canister to upload your data.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="long-update-or-query-calls"><a class="header" href="#long-update-or-query-calls">Long update or query calls</a></h1>
-<p>Pagination and other techniques to deal with large databasets.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="pagination"><a class="header" href="#pagination">Pagination</a></h1>
-<p>To avoid running out of instructions and the returned data size on potentially large datasets, it is possible to limit the number of data rows returned by the SQL query. Use <code>LIMIT &lt;N&gt;</code> to limit the number of rows returned by a query, and <code>OFFSET &lt;N&gt;</code> to skip the first <code>N</code> rows of a responce.</p>
-<p>To return at most 5 persons and skip the first 3:</p>
-<pre><code class="language-sql">SELECT * FROM person LIMIT 5 OFFSET 3
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="testing-sqlite-on-a-large-dataset"><a class="header" href="#testing-sqlite-on-a-large-dataset">Testing SQLite on a Large Dataset</a></h1>
+<p>To build a large database, the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a> from the <a href="https://www.sqlitetutorial.net">SQLite tutorial</a> was used.</p>
+<p><img src="img/chinook-erd.png" alt="Chinook Entity Relationship Diagram" /></p>
+<p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1115397</code> rows and the DB size has grown to <code>80_106_637_312</code> bytes.</p>
+<p>The <code>first name</code> and <code>last name</code> are generated as a string concatenation: <code>{id}customer_name{id}</code> and <code>{id}customer_last_name{id}</code>.</p>
+<p>The 80GiB of data is not possible to process within 40B operations, hence this test shows if SQLite is able to efficiently look for data and only load the necessary pages into the heap memory.</p>
+<h2 id="benchmarks"><a class="header" href="#benchmarks">Benchmarks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Test</th><th>Cycles cost (first run)</th><th>Cycles cost (second run)</th></tr></thead><tbody>
+<tr><td>Count elements on the first call: <code>SELECT COUNT(*) FROM customers</code></td><td>12392402159</td><td>6205886</td></tr>
+<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email WHERE customer_id=900000</code></td><td>36316014</td><td>84516</td></tr>
+<tr><td>Select by the indexed field first name by the exact match: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "2912169customer_name2912169"</code></td><td>33252345</td><td>62988</td></tr>
+<tr><td>Select by first name, that does not exist: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "1"</code></td><td>30067131</td><td>60316</td></tr>
+<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email FROM customers WHERE customerid&gt;900000 and customerid&lt;900050</code></td><td>63839343</td><td>1821716</td></tr>
+<tr><td>Customer count depending on the <code>first name</code>: <code>SELECT count(*) FROM customers WHERE firstname&gt;="1" and firstname&lt;"2"</code></td><td>6498875034</td><td>254846762</td></tr>
+</tbody></table>
+</div><div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
+<div class="admonition-title">
+<div id="admonition-note-title">
+<p>Note</p>
+</div>
+<a class="admonition-anchor-link" href="large_database.html#admonition-note"></a>
+</div>
+<div>
+<p>Note: Query <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code> fails because SQLite does a full table scan and is not able to process the whole table in the given timing constrains.</p>
+</div>
+</div>
+<div id="admonition-note-1" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-1-title">
+<div class="admonition-title">
+<div id="admonition-note-1-title">
+<p>Note</p>
+</div>
+<a class="admonition-anchor-link" href="large_database.html#admonition-note-1"></a>
+</div>
+<div>
+<p>Note: Query <code>SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code> fails because SQLite still processes the full table.</p>
+</div>
+</div>
+<h2 id="reproducing-the-benchmark"><a class="header" href="#reproducing-the-benchmark">Reproducing the Benchmark</a></h2>
+<p>Check out the Benchmark repository <a href="https://github.com/wasm-forge/benchmarks/tree/main/ic-chinook-base">ic-chinook-base</a> if you wish to repeat or examine the experiment.</p>
+<p>Deploy the canister:</p>
+<pre><code class="language-sh">dfx deploy
+</code></pre>
+<p>Download and unzip the chinook database:</p>
+<pre><code class="language-bash">./scripts/sample_download.sh
+</code></pre>
+<p>Upload database into the <code>chinook_base</code> canister:</p>
+<pre><code class="language-bash">./scripts/upload_db.sh
+</code></pre>
+<p>Now you can</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="working-with-the-large-datasets"><a class="header" href="#working-with-the-large-datasets">Working with the Large Datasets</a></h1>
+<ul>
+<li><strong>Use indexed queries.</strong></li>
+</ul>
+<p>Plan ahead, which fields will be critical to search the right elements and create indexes on those fields. If you need to quickly find a person by <code>name</code>, make sure this <code>name</code> field is indexed:</p>
+<pre><code class="language-sql">CREATE INDEX IF NOT EXISTS idx_persons_name ON customers(name);
+</code></pre>
+<p>Plan ahead, how you store your data. If you store the <code>first_name</code> and the <code>last_name</code> concatinated in the same table column, it won't be possible to search by the <code>last_name</code> without a full table scan, eg. <code>... WHERE name LIKE '%Johnson'</code>.</p>
+<ul>
+<li><strong>Check Instructions passed to see if you want to quit early and bulk insertions.</strong></li>
+</ul>
+<ol>
+<li>You can process queries iteratively and check the timing constraints in the loop, if there is not enough time to finish the operation, exit eary with a limited amount of work done.</li>
+<li>Every call to <code>execute</code> causes transactions to open and close on each statement. If you open a transaction before inserting the first, the database will not commit untill you explicitly commit the changes:</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[ic_cdk::update]
+fn add_customers(id_offset: u64) {
+    let start = ic_instruction_counter();
+
+    with_connection(|mut conn| {
+        let tx = conn.transaction().unwrap();
+
+        let sql =
+            String::from("insert into customers (firstname, lastname, email) values (?, ?, ?)");
+
+        {
+            let mut stmt = tx.prepare_cached(&amp;sql).unwrap();
+
+            let mut i = 0;
+
+            // do as many rows as the timing allows
+            while i &lt; 100000000 {
+                let id = id_offset + i + 1;
+                let name = format!("{id}customer_name{id}");
+                let last_name = format!("{id}customer_last_name{id}");
+                let email = format!("{id}customer@example.com");
+
+                stmt.execute(ic_rusqlite::params![name, last_name, email])
+                    .expect("insert of a user failed!");
+
+                i += 1;
+
+                //
+                let end = ic_instruction_counter();
+                if end - start &gt; 20000000000 {
+                    break;
+                }
+            }
+        }
+
+        tx.commit().expect("COMMIT USER INSERTION FAILED!");
+    });
+}
+
+<span class="boring">}</span></code></pre></pre>
+<ul>
+<li><strong>Examine query plan.</strong></li>
+</ul>
+<p>To identify problems with a complex or slow query, study its <a href="https://www.sqlite.org/eqp.html">query plan</a>.
+See if there are any full scans on a table, you might want to change the query logic and/or introduce indexes.</p>
+<ul>
+<li><strong>Use pagination.</strong></li>
+</ul>
+<p>To avoid running out of instructions and the returned data size on potentially large datasets, it is possible to limit the number of data rows returned by the SQL query. Use <code>LIMIT &lt;N&gt;</code> to limit the number of rows returned by a query, and <code>OFFSET &lt;N&gt;</code> to skip the first <code>N</code> rows of a response.</p>
+<p>To return at most 5 persons and skip the first 3, write:</p>
+<pre><code class="language-sql">SELECT * FROM persons LIMIT 5 OFFSET 3
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pragma-settings-1"><a class="header" href="#pragma-settings-1">Pragma settings</a></h1>
 <p>Following <a href="https://sqlite.org/pragma.html">pragma</a> settings are set in <code>ic-rusqlite</code> by default:</p>
@@ -393,11 +500,6 @@ CREATE TABLE orders (
 <p>The pragma settings can be adjusted with SQL queries, you might want to do that during the <code>init</code> or the <code>post_upgrade</code> events:</p>
 <pre><code class="language-sql">    PRAGMA cache_size=1000; -- Reduce the maximum DB cache size
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="backup-and-recover"><a class="header" href="#backup-and-recover">Backup and recover</a></h1>
-<p>Backup and restore via ic-link
-...</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="continuous-integration"><a class="header" href="#continuous-integration">Continuous Integration</a></h1>
-<p>Explore, how can we develop and modify the database in the canister.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="when-is-sqlite-appropriate"><a class="header" href="#when-is-sqlite-appropriate">When Is SQLite Appropriate?</a></h1>
 <p>SQLite is a fast, lightweight SQL database that stores all data in a single file. This works well with a canister's memory model, but there are pros and cons to consider before choosing it.</p>
 <h2 id="when-to-use-sqlite"><a class="header" href="#when-to-use-sqlite">When to Use SQLite</a></h2>
@@ -411,6 +513,10 @@ SQLite supports standard SQL, allowing you to perform advanced queries using <co
 <p><strong>You need transactions.</strong>
 SQLite is ACID-compliant, so it guarantees data consistency, supports rollback, and handles multi-step operations safely.</p>
 </li>
+<li>
+<p><strong>Tabular data with multiple indexes.</strong>
+SQLite is useful, if you have a large table and you want to find records by multiple indexed fields.</p>
+</li>
 </ul>
 <h2 id="when-to-use-stable-structures"><a class="header" href="#when-to-use-stable-structures">When to Use Stable Structures</a></h2>
 <p>If your data needs are simple, stable structures may be faster and easier to use.</p>
@@ -422,11 +528,11 @@ If you don’t need rollback or atomic updates.</p>
 </li>
 <li>
 <p><strong>You don’t need SQL-style queries.</strong>
-For simple lookups, sorting, or iteration, stable data structures are faster and easier to work with.</p>
+For simple <code>key -&gt; value</code> dictionary search, stable data structures are faster and easier to work with.</p>
 </li>
 <li>
 <p><strong>You need speed over flexibility.</strong>
-Structures like <code>Vec</code> provide O(1) index-based access, and <code>BTreeMap</code> gives sorted access with logarithmic complexity — both faster than SQLite for many common tasks.</p>
+Structures like <code>Vec</code> provide O(1) index-based access, and <code>BTreeMap</code> gives sorted access with logarithmic complexity — both are faster than SQLite for many common tasks.</p>
 </li>
 </ul>
 <h2 id="when-to-use-the-file-system"><a class="header" href="#when-to-use-the-file-system">When to Use the File System</a></h2>

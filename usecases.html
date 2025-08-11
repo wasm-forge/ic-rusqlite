@@ -172,6 +172,10 @@ SQLite supports standard SQL, allowing you to perform advanced queries using <co
 <p><strong>You need transactions.</strong>
 SQLite is ACID-compliant, so it guarantees data consistency, supports rollback, and handles multi-step operations safely.</p>
 </li>
+<li>
+<p><strong>Tabular data with multiple indexes.</strong>
+SQLite is useful, if you have a large table and you want to find records by multiple indexed fields.</p>
+</li>
 </ul>
 <h2 id="when-to-use-stable-structures"><a class="header" href="#when-to-use-stable-structures">When to Use Stable Structures</a></h2>
 <p>If your data needs are simple, stable structures may be faster and easier to use.</p>
@@ -183,11 +187,11 @@ If you don’t need rollback or atomic updates.</p>
 </li>
 <li>
 <p><strong>You don’t need SQL-style queries.</strong>
-For simple lookups, sorting, or iteration, stable data structures are faster and easier to work with.</p>
+For simple <code>key -&gt; value</code> dictionary search, stable data structures are faster and easier to work with.</p>
 </li>
 <li>
 <p><strong>You need speed over flexibility.</strong>
-Structures like <code>Vec</code> provide O(1) index-based access, and <code>BTreeMap</code> gives sorted access with logarithmic complexity — both faster than SQLite for many common tasks.</p>
+Structures like <code>Vec</code> provide O(1) index-based access, and <code>BTreeMap</code> gives sorted access with logarithmic complexity — both are faster than SQLite for many common tasks.</p>
 </li>
 </ul>
 <h2 id="when-to-use-the-file-system"><a class="header" href="#when-to-use-the-file-system">When to Use the File System</a></h2>
@@ -212,7 +216,7 @@ Editing or seeking within large files is faster with standard file I/O than load
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="ci.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="pragma_settings.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -223,7 +227,7 @@ Editing or seeking within large files is faster with standard file I/O than load
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="ci.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="pragma_settings.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
