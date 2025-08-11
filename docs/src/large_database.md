@@ -38,20 +38,3 @@ Note: Query `SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900
 ## Reproducing the Benchmark
 
 Check out the Benchmark repository [ic-chinook-base](https://github.com/wasm-forge/benchmarks/tree/main/ic-chinook-base) if you wish to repeat or examine the experiment. 
-
-Deploy the canister:
-```sh
-dfx deploy
-```
-
-Download and unzip the chinook database:
-```bash
-./scripts/sample_download.sh
-```
-
-Upload database into the `chinook_base` canister:
-```bash
-./scripts/upload_db.sh
-```
-
-Now you can 

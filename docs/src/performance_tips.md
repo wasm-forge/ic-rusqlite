@@ -1,21 +1,27 @@
-# Working with the Large Datasets
+# Tips on Working with Large Datasets
 
 
 - **Use indexed queries.**
 
-Plan ahead, which fields will be critical to search the right elements and create indexes on those fields. If you need to quickly find a person by `name`, make sure this `name` field is indexed:
+Plan ahead, which fields will be critical to search the right elements and create indexes on those fields. For example, if you need to quickly find a person by `name`, make sure this `name` field is indexed:
 
 ```sql
 CREATE INDEX IF NOT EXISTS idx_persons_name ON customers(name);
 ```
 
+Also plan how you store your data. If you store the first_name and last_name concatenated in the same column, it won’t be possible to efficiently search by last_name without performing a full table scan, e.g.:
+```sql
+... WHERE name LIKE '%Johnson'
+```
 
-Plan ahead, how you store your data. If you store the `first_name` and the `last_name` concatinated in the same table column, it won't be possible to search by the `last_name` without a full table scan, eg. `... WHERE name LIKE '%Johnson'`.
+Plan ahead, how you store your data. If you store the `first_name` and the `last_name` concatinated in the same table column, it won't be possible to search by the `last_name` without a full table scan, eg. .
 
 - **Check Instructions passed to see if you want to quit early and bulk insertions.**
 
-1. You can process queries iteratively and check the timing constraints in the loop, if there is not enough time to finish the operation, exit eary with a limited amount of work done.
-2. Every call to `execute` causes transactions to open and close on each statement. If you open a transaction before inserting the first, the database will not commit untill you explicitly commit the changes:
+1. When processing queries iteratively, check timing constraints inside the loop. If there isn’t enough time to complete the operation, exit early with a partial result rather than letting the process overrun.
+
+2. Every call to `execute` opens and closes a transaction. To improve performance when inserting many records, open a transaction before the first insert and commit changes only once after all inserts are complete. This avoids committing after each row:
+
 
 ```rust
 #[ic_cdk::update]
