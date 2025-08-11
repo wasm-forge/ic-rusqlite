@@ -5,10 +5,9 @@
 - [Creating Your SQLite Canister](creating_canister.md)
 - [Basic Canister Example](basic_example.md)
 
-- [Performance Considerations](performance.md)
-  - [Benchmarks](benchmarks.md)
-  - [Large Database](large_database.md)
-  - [Performance Tips](performance_tips.md)
+- [Benchmarks](benchmarks.md)
+- [Large Database](large_database.md)
+- [Performance Tips](performance_tips.md)
 
 - [Pragma Settings](pragma_settings.md)
 
