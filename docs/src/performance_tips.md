@@ -9,12 +9,10 @@ Plan ahead, which fields will be critical to search the right elements and creat
 CREATE INDEX IF NOT EXISTS idx_persons_name ON customers(name);
 ```
 
-Also plan how you store your data. If you store the first_name and last_name concatenated in the same column, it won’t be possible to efficiently search by last_name without performing a full table scan, e.g.:
+Also plan how you store your data. If you store the `first_name` and `last_name` concatenated in the same column, it won’t be possible to efficiently search by last_name without performing a full table scan, e.g.:
 ```sql
 ... WHERE name LIKE '%Johnson'
 ```
-
-Plan ahead, how you store your data. If you store the `first_name` and the `last_name` concatinated in the same table column, it won't be possible to search by the `last_name` without a full table scan, eg. .
 
 - **Check Instructions passed to see if you want to quit early and bulk insertions.**
 
