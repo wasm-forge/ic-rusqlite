@@ -405,10 +405,9 @@ CREATE TABLE orders (
 <p>Plan ahead, which fields will be critical to search the right elements and create indexes on those fields. For example, if you need to quickly find a person by <code>name</code>, make sure this <code>name</code> field is indexed:</p>
 <pre><code class="language-sql">CREATE INDEX IF NOT EXISTS idx_persons_name ON customers(name);
 </code></pre>
-<p>Also plan how you store your data. If you store the first_name and last_name concatenated in the same column, it won’t be possible to efficiently search by last_name without performing a full table scan, e.g.:</p>
+<p>Also plan how you store your data. If you store the <code>first_name</code> and <code>last_name</code> concatenated in the same column, it won’t be possible to efficiently search by last_name without performing a full table scan, e.g.:</p>
 <pre><code class="language-sql">... WHERE name LIKE '%Johnson'
 </code></pre>
-<p>Plan ahead, how you store your data. If you store the <code>first_name</code> and the <code>last_name</code> concatinated in the same table column, it won't be possible to search by the <code>last_name</code> without a full table scan, eg. .</p>
 <ul>
 <li><strong>Check Instructions passed to see if you want to quit early and bulk insertions.</strong></li>
 </ul>
