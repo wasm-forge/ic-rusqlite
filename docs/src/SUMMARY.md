@@ -8,12 +8,9 @@
 - [Performance Considerations](performance.md)
   - [Benchmarks](benchmarks.md)
   - [Large Database](large_database.md)
-  - [Long Update or Query Calls](complex_queries.md)
-  - [Pagination](pagination.md)
+  - [Performance Tips](performance_tips.md)
 
 - [Pragma Settings](pragma_settings.md)
-- [Backup and Recovery](backup.md)
-- [Continuous Integration](ci.md)
 
 - [When is SQLite Appropriate?](usecases.md)
 

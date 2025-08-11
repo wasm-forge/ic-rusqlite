@@ -12,6 +12,9 @@ SQLite is ideal when you need structured, reliable, and transactional data stora
 - **You need transactions.**
   SQLite is ACID-compliant, so it guarantees data consistency, supports rollback, and handles multi-step operations safely.
 
+- **Tabular data with multiple indexes.**
+  SQLite is useful, if you have a large table and you want to find records by multiple indexed fields.
+
 ## When to Use Stable Structures
 
 If your data needs are simple, stable structures may be faster and easier to use.
@@ -22,10 +25,10 @@ If your data needs are simple, stable structures may be faster and easier to use
   If you don’t need rollback or atomic updates.
 
 - **You don’t need SQL-style queries.**
-  For simple lookups, sorting, or iteration, stable data structures are faster and easier to work with.
+  For simple `key -> value` dictionary search, stable data structures are faster and easier to work with.
 
 - **You need speed over flexibility.**
-  Structures like `Vec` provide O(1) index-based access, and `BTreeMap` gives sorted access with logarithmic complexity — both faster than SQLite for many common tasks.
+  Structures like `Vec` provide O(1) index-based access, and `BTreeMap` gives sorted access with logarithmic complexity — both are faster than SQLite for many common tasks.
 
 ## When to Use the File System
 

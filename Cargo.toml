@@ -1,6 +1,6 @@
 [package]
 name = "ic-rusqlite"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 keywords = ["internet-computer", "wasi", "sqlite"]
 description = "The project provides easy-to-use library to enable SQLite in your Internet Computer canister."
