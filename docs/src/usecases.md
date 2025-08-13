@@ -40,7 +40,7 @@ For file-based hierarchical data, the file system may be the best choice.
   Storing backups and documents.
 
 - **You work with large data.**
-  Files are larger than the canister's heap memory and/or contain large sections of zeroed memory (sparce files).
+  Files are larger than the canister's heap memory and/or contain large sections of zeroed memory ([sparse files](https://en.wikipedia.org/wiki/Sparse_file)).
 
 - **You perform byte-level data manipulation.**
   Editing or seeking within large files is faster with standard file I/O than loading and modifying data through an SQL database.
