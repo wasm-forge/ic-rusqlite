@@ -11,8 +11,6 @@ The `customers` table was constantly filled with relatively large rows, until th
 
 The `first name` and `last name` are generated as a string concatenation: `{id}customer_name{id}` and `{id}customer_last_name{id}`, so that all names are unique.
 
-The 80GiB of data is not possible to process within 40B operations, hence this test shows if SQLite is able to efficiently look for data and only load the necessary pages into the heap memory.
-
 
 ## Benchmarks
 
@@ -32,9 +30,9 @@ Select a person using `OFFSET`: `SELECT firstname, lastname, email FROM customer
 Note: Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending `EXPLAIN QUERY PLAN` to your query:
 
 `EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000`
-
-
 ```
+
+This test shows that it is possible to create a very large database, it is however, not as optimal as one might expect. On a large database some operations will always fail because they would require too many cycles. The exact limit on the database size may depend on many aspects such as the page size, the row size and number, and the table structure. The actual "practial" database size might be in range from 2GiB to 20GiB, which might be enough in the majority of usecases.
 
 
 ## Reproducing the Benchmarks
