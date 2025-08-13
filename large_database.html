@@ -164,7 +164,6 @@
 <p><img src="img/chinook-erd.png" alt="Chinook Entity Relationship Diagram" /></p>
 <p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1115397</code> rows and the DB size has grown to <code>80_106_637_312</code> bytes.</p>
 <p>The <code>first name</code> and <code>last name</code> are generated as a string concatenation: <code>{id}customer_name{id}</code> and <code>{id}customer_last_name{id}</code>, so that all names are unique.</p>
-<p>The 80GiB of data is not possible to process within 40B operations, hence this test shows if SQLite is able to efficiently look for data and only load the necessary pages into the heap memory.</p>
 <h2 id="benchmarks"><a class="header" href="#benchmarks">Benchmarks</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Test</th><th>Cycles cost (first run)</th><th>Cycles cost (second run)</th></tr></thead><tbody>
 <tr><td>Count elements on the first call: <code>SELECT COUNT(*) FROM customers</code></td><td>12392402159</td><td>6205886</td></tr>
@@ -188,6 +187,7 @@
 <p><code>EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code></p>
 </div>
 </div>
+<p>This test shows that it is possible to create a very large database, it is however, not as optimal as one might expect. On a large database some operations will always fail because they would require too many cycles. The exact limit on the database size may depend on many aspects such as the page size, the row size and number, and the table structure. The actual "practial" database size might be in range from 2GiB to 20GiB, which might be enough in the majority of usecases.</p>
 <h2 id="reproducing-the-benchmarks"><a class="header" href="#reproducing-the-benchmarks">Reproducing the Benchmarks</a></h2>
 <p>Check out the Benchmark repository <a href="https://github.com/wasm-forge/benchmarks/tree/main/ic-chinook-base">ic-chinook-base</a> if you wish to repeat or examine the experiment.</p>
 
