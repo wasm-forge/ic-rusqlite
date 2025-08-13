@@ -361,7 +361,7 @@ CREATE TABLE orders (
 <p>To build a large database, the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a> from the <a href="https://www.sqlitetutorial.net">SQLite tutorial</a> was used.</p>
 <p><img src="img/chinook-erd.png" alt="Chinook Entity Relationship Diagram" /></p>
 <p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1115397</code> rows and the DB size has grown to <code>80_106_637_312</code> bytes.</p>
-<p>The <code>first name</code> and <code>last name</code> are generated as a string concatenation: <code>{id}customer_name{id}</code> and <code>{id}customer_last_name{id}</code>.</p>
+<p>The <code>first name</code> and <code>last name</code> are generated as a string concatenation: <code>{id}customer_name{id}</code> and <code>{id}customer_last_name{id}</code>, so that all names are unique.</p>
 <p>The 80GiB of data is not possible to process within 40B operations, hence this test shows if SQLite is able to efficiently look for data and only load the necessary pages into the heap memory.</p>
 <h2 id="benchmarks"><a class="header" href="#benchmarks">Benchmarks</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Test</th><th>Cycles cost (first run)</th><th>Cycles cost (second run)</th></tr></thead><tbody>
@@ -371,6 +371,8 @@ CREATE TABLE orders (
 <tr><td>Select by first name, that does not exist: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "1"</code></td><td>30067131</td><td>60316</td></tr>
 <tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email FROM customers WHERE customerid&gt;900000 and customerid&lt;900050</code></td><td>63839343</td><td>1821716</td></tr>
 <tr><td>Customer count depending on the <code>first name</code>: <code>SELECT count(*) FROM customers WHERE firstname&gt;="1" and firstname&lt;"2"</code></td><td>6498875034</td><td>254846762</td></tr>
+<tr><td>Select a person that doesn't exist using <code>LIKE</code>: <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code></td><td>Failed</td><td></td></tr>
+<tr><td>Select a person using <code>OFFSET</code>: <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code></td><td>Failed</td><td></td></tr>
 </tbody></table>
 </div><div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
@@ -380,21 +382,11 @@ CREATE TABLE orders (
 <a class="admonition-anchor-link" href="large_database.html#admonition-note"></a>
 </div>
 <div>
-<p>Note: Query <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code> fails because SQLite does a full table scan and is not able to process the whole table in the given timing constrains.</p>
+<p>Note: Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending <code>EXPLAIN QUERY PLAN</code> to your query:</p>
+<p><code>EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code></p>
 </div>
 </div>
-<div id="admonition-note-1" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-1-title">
-<div class="admonition-title">
-<div id="admonition-note-1-title">
-<p>Note</p>
-</div>
-<a class="admonition-anchor-link" href="large_database.html#admonition-note-1"></a>
-</div>
-<div>
-<p>Note: Query <code>SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code> fails because SQLite still processes the full table.</p>
-</div>
-</div>
-<h2 id="reproducing-the-benchmark"><a class="header" href="#reproducing-the-benchmark">Reproducing the Benchmark</a></h2>
+<h2 id="reproducing-the-benchmarks"><a class="header" href="#reproducing-the-benchmarks">Reproducing the Benchmarks</a></h2>
 <p>Check out the Benchmark repository <a href="https://github.com/wasm-forge/benchmarks/tree/main/ic-chinook-base">ic-chinook-base</a> if you wish to repeat or examine the experiment.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tips-on-working-with-large-datasets"><a class="header" href="#tips-on-working-with-large-datasets">Tips on Working with Large Datasets</a></h1>
 <ul>
@@ -539,7 +531,7 @@ Storing backups and documents.</p>
 </li>
 <li>
 <p><strong>You work with large data.</strong>
-Files are larger than the canister's heap memory and/or contain large sections of zeroed memory (sparce files).</p>
+Files are larger than the canister's heap memory and/or contain large sections of zeroed memory (<a href="https://en.wikipedia.org/wiki/Sparse_file">sparse files</a>).</p>
 </li>
 <li>
 <p><strong>You perform byte-level data manipulation.</strong>
