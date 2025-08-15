@@ -49,9 +49,11 @@ The ability to associate a file with a virtual memory is a special feature of [`
 
 ## Using File System
 
-With the `ic-rusqlite` it is possible to use standart Rust I/O functions to create files.
+`ic-rusqlite` is compiled via WASI target, which is then processed by the `wasi2ic` workflow, as a result, the `ic-wasi-polyfill` and the `stable-fs` are present in the binary. Therefore, it is possible to use the standart Rust I/O functions to read and write files.
 
-Currently, for technical reasons, the database is stored in the root folder: `/main.db`, but a few additional helper files may be created by the SQLite engine.
+```admonish note
+By default the main database file is stored in the root folder: `/main.db` and there are a few additional [helper files](https://www.sqlite.org/tempfiles.html) that can be created by the databsae engine.
+```
 
 ## Other Stable Structures
 
