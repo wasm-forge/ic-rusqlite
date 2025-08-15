@@ -217,8 +217,9 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 }
 </code></pre>
 <h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the Database</a></h2>
-<p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so you don't need to explicitly initialize or create the database.</p>
-<p>Internally, the <code>ic_rusqlite</code> depends on the <code>ic-wasi-polyfill</code> library, which is backed up by the <code>stable-fs</code> storage. The <code>stable-fs</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system, and the virtual memory with the ID <code>120</code> is storing the database.</p>
+<p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so there is no need to explicitly initialize or create a database.</p>
+<p>Internally, the <code>ic-rusqlite</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system.</p>
+<p>The virtual memory with the ID <code>120</code> is the default storage memory for the database database file is <code>main.db</code>. These settings are default, but can be via the <code>set_connection_settings(...)</code> function.</p>
 <div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
 <div id="admonition-note-title">
@@ -231,8 +232,18 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 </div>
 </div>
 <h2 id="using-file-system"><a class="header" href="#using-file-system">Using File System</a></h2>
-<p>With the <code>ic-rusqlite</code> it is possible to use standart Rust I/O functions to create files.</p>
-<p>Currently, for technical reasons, the database is stored in the root folder: <code>/main.db</code>, but a few additional helper files may be created by the SQLite engine.</p>
+<p><code>ic-rusqlite</code> is compiled to the WASI target and then processed by the <a href="https://github.com/wasm-forge/wasi2ic"><code>wasi2ic</code> workflow</a>, embedding <code>ic-wasi-polyfill</code> and <code>stable-fs</code> into the output binary. This enables the use of standard Rust I/O APIs for file operations.</p>
+<div id="admonition-note-1" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-1-title">
+<div class="admonition-title">
+<div id="admonition-note-1-title">
+<p>Note</p>
+</div>
+<a class="admonition-anchor-link" href="creating_canister.html#admonition-note-1"></a>
+</div>
+<div>
+<p>By default the main database file is stored in the root folder: <code>/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the databsae engine.</p>
+</div>
+</div>
 <h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">
@@ -307,16 +318,6 @@ fn init() {
 <p>For a complete picture of what you can accomplish with a <code>Connection</code>, see the <a href="https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html"><strong>rusqlite</strong> documentation</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ic-rusqlite-users-orders-benchmark"><a class="header" href="#ic-rusqlite-users-orders-benchmark"><code>ic-rusqlite</code> Users-Orders Benchmark</a></h1>
 <p>This project benchmarks <code>ic-rusqlite</code> dependency on a benchmark canister, the original benchmark project can be found here in the <a href="https://github.com/wasm-forge/benchmarks/tree/main/sql-users-orders">benchmarks repository</a>.</p>
-<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
-<p>It is assumed that you have <a href="https://doc.rust-lang.org/book/ch01-01-installation.html">rust</a>,
-<a href="https://internetcomputer.org/docs/current/developer-docs/setup/install/">dfx</a>.</p>
-<p>You will also need the Wasm-oriented <a href="https://github.com/WebAssembly/wasi-sdk/releases/">clang</a> installation.</p>
-<p>Install wasi2ic and canbench:</p>
-<pre><code class="language-bash">  cargo install wasi2ic
-  cargo install canbench
-</code></pre>
-<h2 id="deployment-and-testing"><a class="header" href="#deployment-and-testing">Deployment and testing</a></h2>
-<p>To run benchmarks, launch the <code>canbench</code> command.</p>
 <h2 id="pragma-settings"><a class="header" href="#pragma-settings">Pragma settings</a></h2>
 <p>This shows the current benchmark results for database performance based on a database file that writes directly to a stable memory (minimized chunked storage overheads).</p>
 <p>Following <a href="https://sqlite.org/pragma.html">pragma</a> settings:</p>
@@ -357,7 +358,10 @@ CREATE TABLE orders (
 <tr><td>Create 1M orders after indices were created</td><td>29.88 B</td></tr>
 <tr><td>Delete 100000 orders with transaction rollback: <code>BEGIN TRANSACTION; DELETE FROM orders WHERE order_id &gt; 900000; ROLLBACK</code></td><td>1.53 B</td></tr>
 </tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="testing-sqlite-on-a-large-dataset"><a class="header" href="#testing-sqlite-on-a-large-dataset">Testing SQLite on a Large Dataset</a></h1>
+</div>
+<h2 id="reproducing-the-benchmarks"><a class="header" href="#reproducing-the-benchmarks">Reproducing the Benchmarks</a></h2>
+<p>Check out the Benchmark repository <a href="https://github.com/wasm-forge/benchmarks/tree/main/sql-users-orders">sql-users-orders</a> if you wish to repeat or examine the experiment.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="testing-sqlite-on-a-large-dataset"><a class="header" href="#testing-sqlite-on-a-large-dataset">Testing SQLite on a Large Dataset</a></h1>
 <p>To build a large database, the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a> from the <a href="https://www.sqlitetutorial.net">SQLite tutorial</a> was used.</p>
 <p><img src="img/chinook-erd.png" alt="Chinook Entity Relationship Diagram" /></p>
 <p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1115397</code> rows and the DB size has grown to <code>80_106_637_312</code> bytes.</p>
@@ -386,7 +390,7 @@ CREATE TABLE orders (
 </div>
 </div>
 <p>This test shows that it is possible to create a very large database, it is however, not as optimal as one might expect. On a large database some operations will always fail because they would require too many cycles. The exact limit on the database size may depend on many aspects such as the page size, the row size and number, and the table structure. The actual "practial" database size might be in range from 2GiB to 20GiB, which might be enough in the majority of usecases.</p>
-<h2 id="reproducing-the-benchmarks"><a class="header" href="#reproducing-the-benchmarks">Reproducing the Benchmarks</a></h2>
+<h2 id="reproducing-the-benchmarks-1"><a class="header" href="#reproducing-the-benchmarks-1">Reproducing the Benchmarks</a></h2>
 <p>Check out the Benchmark repository <a href="https://github.com/wasm-forge/benchmarks/tree/main/ic-chinook-base">ic-chinook-base</a> if you wish to repeat or examine the experiment.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tips-on-working-with-large-datasets"><a class="header" href="#tips-on-working-with-large-datasets">Tips on Working with Large Datasets</a></h1>
 <ul>
