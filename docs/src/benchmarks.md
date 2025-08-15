@@ -2,23 +2,6 @@
 
 This project benchmarks `ic-rusqlite` dependency on a benchmark canister, the original benchmark project can be found here in the [benchmarks repository](https://github.com/wasm-forge/benchmarks/tree/main/sql-users-orders).
 
-## Prerequisites
-
-It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), 
-[dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
-
-You will also need the Wasm-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
-
-Install wasi2ic and canbench:
-```bash
-  cargo install wasi2ic
-  cargo install canbench
-```
-
-
-## Deployment and testing
-
-To run benchmarks, launch the `canbench` command.
 
 ## Pragma settings
 
@@ -37,7 +20,6 @@ Pragma         | Value                   | Description
 
 
 ## Database structure
-
 ``` sql
 CREATE TABLE users (
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,3 +52,7 @@ Remove 1000 orders (we remove all orders from the first 100 users): `DELETE FROM
 Create 1M orders after indices were created                                                                                   | 29.88 B
 Delete 100000 orders with transaction rollback: `BEGIN TRANSACTION; DELETE FROM orders WHERE order_id > 900000; ROLLBACK`     | 1.53 B
 
+
+## Reproducing the Benchmarks
+
+Check out the Benchmark repository [sql-users-orders](https://github.com/wasm-forge/benchmarks/tree/main/sql-users-orders) if you wish to repeat or examine the experiment. 
