@@ -194,7 +194,7 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the Database</a></h2>
 <p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so there is no need to explicitly initialize or create a database.</p>
 <p>Internally, the <code>ic-rusqlite</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system.</p>
-<p>The virtual memory with the ID <code>120</code> is the default storage memory for the database database file is <code>main.db</code>. These settings are default, but can be via the <code>set_connection_settings(...)</code> function.</p>
+<p>The virtual memory with the ID <code>120</code> is the default storage memory for the database database file is <code>/DB/main.db</code>. These settings are default, but can be change via the <code>set_connection_config(...)</code> function.</p>
 <div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
 <div id="admonition-note-title">
@@ -216,7 +216,7 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <a class="admonition-anchor-link" href="#admonition-note-1"></a>
 </div>
 <div>
-<p>By default the main database file is stored in the root folder: <code>/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the databsae engine.</p>
+<p>By default the main database file is stored in the root folder: <code>/DB/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the databsae engine.</p>
 </div>
 </div>
 <h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
