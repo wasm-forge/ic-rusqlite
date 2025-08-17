@@ -14,7 +14,7 @@ const FS_MEMORY_RANGE: Range<u8> = 101..119;
 const DEFAULT_MOUNTED_DB_ID: u8 = 120;
 
 /// Database file name
-const DEFAULT_DB_FILE_NAME: &str = "main.db";
+const DEFAULT_DB_FILE_NAME: &str = "/DB/main.db";
 
 // re-export some of the core dependencies for others to use
 pub use ic_wasi_polyfill;
@@ -28,10 +28,11 @@ thread_local! {
 
         let m = MemoryManager::init(DefaultMemoryImpl::default());
 
-        // add tmp folder
-        let _ = std::fs::create_dir_all("/tmp");
         // initialize ic-wasi-polyfill
         ic_wasi_polyfill::init_with_memory_manager(&[0u8; 32], &[("SQLITE_TMPDIR", "/tmp")], &m, FS_MEMORY_RANGE);
+
+        // add tmp folder
+        let _ = std::fs::create_dir_all("/tmp");
 
         RefCell::new(m)
     };
@@ -40,27 +41,27 @@ thread_local! {
     pub static CONNECTION: RefCell<Option<Connection>> = RefCell::new(Some(create_connection()));
 
     /// Preconfigured connection that will be used on the next database Open call
-    pub static CONNECTION_SETUP: RefCell<ConnectionSetup> = RefCell::new(ConnectionSetup::default());
+    pub static CONNECTION_SETUP: RefCell<ConnectionConfig> = RefCell::new(ConnectionConfig::default());
 }
 
-/// Connection setup to configure a database connection
-#[derive(Clone)]
-pub struct ConnectionSetup {
+/// Connection configuration for a database connection
+#[derive(Clone, Debug)]
+pub struct ConnectionConfig {
     /// File name of the database
-    file_name: String,
+    pub db_file_name: String,
     /// The ID of the mounted virtual memory for the database storage
-    db_mount_id: Option<u8>,
+    pub db_file_mount_id: Option<u8>,
     /// Default pragma settings to activate right after connection
-    pragma_settings: HashMap<String, String>,
+    pub pragma_settings: HashMap<String, String>,
 }
 
-impl ConnectionSetup {
+impl ConnectionConfig {
     pub fn new() -> Self {
-        ConnectionSetup::default()
+        ConnectionConfig::default()
     }
 }
 
-impl Default for ConnectionSetup {
+impl Default for ConnectionConfig {
     fn default() -> Self {
         let mut default_pragmas = HashMap::new();
 
@@ -84,8 +85,8 @@ impl Default for ConnectionSetup {
         default_pragmas.insert("cache_size".to_string(), "500000".to_string());
 
         Self {
-            file_name: DEFAULT_DB_FILE_NAME.to_string(),
-            db_mount_id: Some(DEFAULT_MOUNTED_DB_ID),
+            db_file_name: DEFAULT_DB_FILE_NAME.to_string(),
+            db_file_mount_id: Some(DEFAULT_MOUNTED_DB_ID),
             pragma_settings: default_pragmas,
         }
     }
@@ -102,13 +103,13 @@ pub fn close_connection() {
     })
 }
 
-/// Get a clone of the current connection setup
-pub fn get_connection_setup() -> ConnectionSetup {
+/// Get a clone of the current connection configuration
+pub fn get_connection_config() -> ConnectionConfig {
     CONNECTION_SETUP.with(|setup| setup.borrow().clone())
 }
 
 /// Replace the current connection setup with a new one
-pub fn set_connection_setup(new_setup: ConnectionSetup) {
+pub fn set_connection_config(new_setup: ConnectionConfig) {
     CONNECTION_SETUP.with(|setup| {
         let mut s = setup.borrow_mut();
         *s = new_setup
@@ -116,30 +117,38 @@ pub fn set_connection_setup(new_setup: ConnectionSetup) {
 }
 
 fn create_connection() -> Connection {
-    let setup = get_connection_setup();
+    // init file system
+    MEMORY_MANAGER.with_borrow(|_m| {
+        println!("initializing file system");
+    });
+
+    let setup = get_connection_config();
 
     // unmount old mount, in case it was created
-    ic_wasi_polyfill::unmount_memory_file(&setup.file_name);
+    ic_wasi_polyfill::unmount_memory_file(&setup.db_file_name);
 
-    if let Some(mount_id) = setup.db_mount_id {
+    if let Some(mount_id) = setup.db_file_mount_id {
+        println!("mount id: {mount_id}");
+
         let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(mount_id)));
 
         // dedicate a virtual memory to the database file
-        ic_wasi_polyfill::mount_memory_file(&setup.file_name, Box::new(memory));
+        ic_wasi_polyfill::mount_memory_file(&setup.db_file_name, Box::new(memory));
     }
 
     // remove lock if it exists
-    let _ = std::fs::remove_dir_all(format!("{}.lock", setup.file_name));
+    let _ = std::fs::remove_dir_all(format!("{}.lock", setup.db_file_name));
 
     // create folder before opening the database
-    let path = Path::new(&setup.file_name).parent();
+    let path = Path::new(&setup.db_file_name).parent();
     if let Some(path) = path {
         // create containing folder for the database
         let _ = std::fs::create_dir_all(path);
     }
 
     // Create a new connection to the file
-    let conn = rusqlite::Connection::open(setup.file_name).expect("Failed opening the database!");
+    let conn =
+        rusqlite::Connection::open(setup.db_file_name).expect("Failed opening the database!");
 
     // set pragmas
     for (k, v) in &setup.pragma_settings {

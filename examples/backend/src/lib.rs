@@ -5,9 +5,42 @@ extern crate serde;
 
 use candid::CandidType;
 use ic_cdk::call::RejectCode;
+use ic_cdk::init;
+use ic_cdk::post_upgrade;
+use ic_cdk::pre_upgrade;
 use ic_cdk::query;
 use ic_cdk::update;
 use ic_rusqlite::with_connection;
+
+#[init]
+fn init() {
+    ic_rusqlite::close_connection();
+
+    // default configuration
+    let mut config = ic_rusqlite::ConnectionConfig::new();
+
+    // optinally, create a custom connection to a database different from the default one
+    config.db_file_name = "/my_custom_path/my_base.db".to_string(); // some custom path to the database
+    config.db_file_mount_id = Some(150); // store database in the virtual memory ID 150
+    config
+        .pragma_settings
+        .insert("cache_size".to_string(), "10000".to_string()); // modify the default pragma settings
+
+    ic_rusqlite::set_connection_config(config);
+}
+
+#[pre_upgrade]
+fn pre_upgrade() {
+    // closing connection explicitly unlocks the database,
+    // you should do that if the `locking_mode` pragma is set to 'EXCLUSIVE'
+    ic_rusqlite::close_connection();
+}
+
+#[post_upgrade]
+fn post_upgrade() {
+    // same initialization
+    init();
+}
 
 #[update]
 fn create() -> Result {
@@ -29,40 +62,83 @@ fn create() -> Result {
     })
 }
 
-#[query]
-fn query(params: QueryParams) -> Result {
-    with_connection(|conn| {
-        // prepare statement with parameters
-        let mut stmt = match conn.prepare("select * from person limit ?1 offset ?2") {
-            Ok(e) => e,
-            Err(err) => {
-                return Err(Error::CanisterError {
-                    message: format!("{:?}", err),
-                });
-            }
-        };
+#[update]
+fn ls_path(path: String) -> Vec<String> {
+    let mut entries = Vec::new();
 
-        // query with parameters and process it on a row-by-row basis
-        let person_iter = match stmt.query_map((params.limit, params.offset), |row| {
-            Ok(PersonQuery {
-                id: row.get(0).unwrap(),
-                name: row.get(1).unwrap(),
-                age: row.get(2).unwrap(),
-            })
-        }) {
-            Ok(e) => e,
-            Err(err) => {
-                return Err(Error::CanisterError {
-                    message: format!("{:?}", err),
-                });
+    if let Ok(read_dir) = std::fs::read_dir(std::path::Path::new(&path)) {
+        for entry in read_dir {
+            if let Ok(entry) = entry {
+                if let Some(name) = entry.path().to_str() {
+                    entries.push(name.to_string());
+                }
             }
-        };
-
-        let mut persons = Vec::new();
-        for person in person_iter {
-            persons.push(person.unwrap());
         }
-        let res = serde_json::to_string(&persons).unwrap();
+    }
+
+    entries
+}
+
+type QueryResult<T = Vec<Vec<String>>, E = Error> = std::result::Result<T, E>;
+
+#[ic_cdk::update]
+fn execute(sql: String) -> Result {
+    with_connection(|conn| match conn.execute(&sql, []) {
+        Ok(_) => Ok(format!(
+            "execute performance_counter: {:?}",
+            ic_cdk::api::performance_counter(0)
+        )),
+        Err(err) => Err(Error::CanisterError {
+            message: format!("execute: {err:?}"),
+        }),
+    })
+}
+
+#[ic_cdk::update]
+fn query(sql: String) -> QueryResult {
+    // get connection
+    ic_rusqlite::with_connection(|conn| {
+        let mut stmt = conn.prepare(&sql).unwrap();
+        let cnt = stmt.column_count();
+        let mut rows = stmt.query([]).unwrap();
+        let mut res: Vec<Vec<String>> = Vec::new();
+
+        loop {
+            match rows.next() {
+                Ok(row) => match row {
+                    Some(row) => {
+                        let mut vec: Vec<String> = Vec::new();
+                        for idx in 0..cnt {
+                            let v = row.get_ref_unwrap(idx);
+                            match v.data_type() {
+                                ic_rusqlite::rusqlite::types::Type::Null => {
+                                    vec.push(String::from(""))
+                                }
+                                ic_rusqlite::rusqlite::types::Type::Integer => {
+                                    vec.push(v.as_i64().unwrap().to_string())
+                                }
+                                ic_rusqlite::rusqlite::types::Type::Real => {
+                                    vec.push(v.as_f64().unwrap().to_string())
+                                }
+                                ic_rusqlite::rusqlite::types::Type::Text => {
+                                    vec.push(v.as_str().unwrap().parse().unwrap())
+                                }
+                                ic_rusqlite::rusqlite::types::Type::Blob => {
+                                    vec.push(hex::encode(v.as_blob().unwrap()))
+                                }
+                            }
+                        }
+                        res.push(vec)
+                    }
+                    None => break,
+                },
+                Err(err) => {
+                    return Err(Error::CanisterError {
+                        message: format!("{err:?}"),
+                    });
+                }
+            }
+        }
         Ok(res)
     })
 }

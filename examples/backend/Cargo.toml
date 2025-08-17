@@ -8,6 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 candid = "0.10.14"
+hex = "0.4.3"
 ic-cdk = "0.18.5"
 ic-rusqlite = { path = "../../../ic-rusqlite" }
 serde = { version = "1", features = ["derive"] }
