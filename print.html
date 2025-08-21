@@ -244,7 +244,7 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <p>By default the main database file is stored in the root folder: <code>/DB/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the databsae engine.</p>
 </div>
 </div>
-<h2 id="other-stable-structures"><a class="header" href="#other-stable-structures">Other Stable Structures</a></h2>
+<h2 id="using-stable-structures"><a class="header" href="#using-stable-structures">Using Stable Structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">
 <div class="admonition-title">
@@ -316,6 +316,51 @@ fn init() {
 }
 <span class="boring">}</span></code></pre></pre>
 <p>For a complete picture of what you can accomplish with a <code>Connection</code>, see the <a href="https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html"><strong>rusqlite</strong> documentation</a>.</p>
+<h2 id="creating-a-custom-database-connection"><a class="header" href="#creating-a-custom-database-connection">Creating a custom database connection</a></h2>
+<p>You can create a customized database connection, in case you want to store it in another file mount onto another virtual memory or customize its initial pragma settings:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[init]
+fn init() {
+    // default configuration
+    let mut config = ic_rusqlite::ConnectionConfig::new();
+
+    // optinally, create a custom connection to a database different from the default one
+    config.db_file_name = "/my_custom_path/my_base.db".to_string(); // some custom path to the database
+    config.db_file_mount_id = Some(150); // store database in the virtual memory ID 150
+    config
+        .pragma_settings
+        .insert("cache_size".to_string(), "10000".to_string()); // modify the default pragma settings
+
+    ic_rusqlite::set_connection_config(config);
+    //...
+    // The actual connection is not needed here, it will be done automatically on the next "with_connection" statement.
+}
+
+#[pre_upgrade]
+fn pre_upgrade() {
+    // closing connection explicitly unlocks the database before canister upgrade
+    ic_rusqlite::close_connection();
+}
+
+#[post_upgrade]
+fn post_upgrade() {
+    // same initialization
+    init();
+}
+<span class="boring">}</span></code></pre></pre>
+<p>In this example, we explicitly close the database connection in the <code>pre_upgrade</code> hook. This ensures that the database lock is released, preventing any issues when creating a new connection after the canister upgrade.</p>
+<div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
+<div class="admonition-title">
+<div id="admonition-note-title">
+<p>Note</p>
+</div>
+<a class="admonition-anchor-link" href="basic_example.html#admonition-note"></a>
+</div>
+<div>
+<p><strong>Note:</strong> Since the canister operates in single-user mode, there is no risk of conflicts from concurrent connections. Therefore, <code>ic-rusqlite</code> will attempt to delete the lock file when establishing a database connection, if one is found. This means that even if you do not explicitly close the connection, you will not be locked out of the database after an upgrade. However, the situation is different if the database remains locked and, after a canister upgrade, you attempt to use it with an <a href="https://www.sqlite.org/lang_attach.html"><code>ATTACH DATABASE</code></a> query.</p>
+</div>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ic-rusqlite-users-orders-benchmark"><a class="header" href="#ic-rusqlite-users-orders-benchmark"><code>ic-rusqlite</code> Users-Orders Benchmark</a></h1>
 <p>This project benchmarks <code>ic-rusqlite</code> dependency on a benchmark canister, the original benchmark project can be found here in the <a href="https://github.com/wasm-forge/benchmarks/tree/main/sql-users-orders">benchmarks repository</a>.</p>
 <h2 id="pragma-settings"><a class="header" href="#pragma-settings">Pragma settings</a></h2>
@@ -385,7 +430,7 @@ CREATE TABLE orders (
 <a class="admonition-anchor-link" href="large_database.html#admonition-note"></a>
 </div>
 <div>
-<p>Note: Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending <code>EXPLAIN QUERY PLAN</code> to your query:</p>
+<p><strong>Note:</strong> Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending <code>EXPLAIN QUERY PLAN</code> to your query:</p>
 <p><code>EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code></p>
 </div>
 </div>

@@ -183,7 +183,7 @@
 <a class="admonition-anchor-link" href="#admonition-note"></a>
 </div>
 <div>
-<p>Note: Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending <code>EXPLAIN QUERY PLAN</code> to your query:</p>
+<p><strong>Note:</strong> Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending <code>EXPLAIN QUERY PLAN</code> to your query:</p>
 <p><code>EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000</code></p>
 </div>
 </div>
