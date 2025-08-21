@@ -27,7 +27,7 @@ Select a person using `OFFSET`: `SELECT firstname, lastname, email FROM customer
 
 
 ```admonish note
-Note: Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending `EXPLAIN QUERY PLAN` to your query:
+**Note:** Both failing queries require full table scan, and SQLite is not able to process that amount within estimated time, you can check if a query is going for a full scan by prepending `EXPLAIN QUERY PLAN` to your query:
 
 `EXPLAIN QUERY PLAN SELECT firstname, lastname, email FROM customers LIMIT 5 OFFSET 900000`
 ```

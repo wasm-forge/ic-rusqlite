@@ -58,7 +58,7 @@ The ability to associate a file with a virtual memory is a special feature of [`
 By default the main database file is stored in the root folder: `/DB/main.db` and there are a few additional [helper files](https://www.sqlite.org/tempfiles.html) that can be created by the databsae engine.
 ```
 
-## Other Stable Structures
+## Using Stable Structures
 
 You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.
 

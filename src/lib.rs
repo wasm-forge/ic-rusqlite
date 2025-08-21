@@ -119,7 +119,7 @@ pub fn set_connection_config(new_setup: ConnectionConfig) {
 fn create_connection() -> Connection {
     // init file system
     MEMORY_MANAGER.with_borrow(|_m| {
-        println!("initializing file system");
+        // init file system
     });
 
     let setup = get_connection_config();
@@ -128,8 +128,6 @@ fn create_connection() -> Connection {
     ic_wasi_polyfill::unmount_memory_file(&setup.db_file_name);
 
     if let Some(mount_id) = setup.db_file_mount_id {
-        println!("mount id: {mount_id}");
-
         let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(mount_id)));
 
         // dedicate a virtual memory to the database file

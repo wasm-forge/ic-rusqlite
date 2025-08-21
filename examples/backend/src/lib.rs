@@ -1,5 +1,3 @@
-//#[macro_use]
-//extern crate ic_cdk_macros;
 #[macro_use]
 extern crate serde;
 
@@ -14,8 +12,6 @@ use ic_rusqlite::with_connection;
 
 #[init]
 fn init() {
-    ic_rusqlite::close_connection();
-
     // default configuration
     let mut config = ic_rusqlite::ConnectionConfig::new();
 
@@ -31,8 +27,7 @@ fn init() {
 
 #[pre_upgrade]
 fn pre_upgrade() {
-    // closing connection explicitly unlocks the database,
-    // you should do that if the `locking_mode` pragma is set to 'EXCLUSIVE'
+    // closing connection explicitly unlocks the database before canister upgrade
     ic_rusqlite::close_connection();
 }
 
