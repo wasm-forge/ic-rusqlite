@@ -7,7 +7,9 @@ To build a large database, the sample [`Chinook` database](https://www.sqlitetut
 ![Chinook Entity Relationship Diagram](img/chinook-erd.png)
 
 
-The `customers` table was constantly filled with relatively large rows, until the table has reached `1115397` rows and the DB size has grown to `80_106_637_312` bytes.
+Before testing, the database was changed to have a typical `4096` byte page size.
+
+The `customers` table was constantly filled with relatively large rows, until the table has reached `1001753` rows and the DB size has grown to `71_248_150_528` bytes.
 
 The `first name` and `last name` are generated as a string concatenation: `{id}customer_name{id}` and `{id}customer_last_name{id}`, so that all names are unique.
 
@@ -16,12 +18,12 @@ The `first name` and `last name` are generated as a string concatenation: `{id}c
 
 Test                  | Cycles cost (first run)  | Cycles cost (second run)
 ----------------------|--------------------------|----------------------------------
-Count elements on the first call: `SELECT COUNT(*) FROM customers`                  | 12392402159  |  6205886
-Customer search by row ID: `SELECT firstname, lastname, email WHERE customer_id=900000` | 36316014  |   84516
-Select by the indexed field first name by the exact match: `SELECT firstname, lastname, email FROM customers WHERE firstname = "2912169customer_name2912169"` | 33252345  |  62988
-Select by first name, that does not exist: `SELECT firstname, lastname, email FROM customers WHERE firstname = "1"` | 30067131  |  60316
-Customer search by row ID: `SELECT firstname, lastname, email FROM customers WHERE customerid>900000 and customerid<900050` | 63839343  |  1821716
-Customer count depending on the `first name`: `SELECT count(*) FROM customers WHERE firstname>="1" and firstname<"2"` | 6498875034  |  254846762
+Count elements on the first call: `SELECT COUNT(*) FROM customers`                  | 7950194543  | 1399546
+Customer search by row ID: `SELECT firstname, lastname, email WHERE customer_id=900000` | 38562206  |   62421
+Select by the indexed field first name by the exact match: `SELECT firstname, lastname, email FROM customers WHERE firstname = "2912169customer_name2912169"` | 35285083  |  61988
+Select by first name, that does not exist: `SELECT firstname, lastname, email FROM customers WHERE firstname = "1"` | 32143563  |  59929
+Customer search by row ID: `SELECT firstname, lastname, email FROM customers WHERE customerid>900000 and customerid<900050` | 45809516  | 740405
+Customer count depending on the `first name`: `SELECT count(*) FROM customers WHERE firstname>="1" and firstname<"2"` | 6729952521  |  361297471
 Select a person that doesn't exist using `LIKE`: `SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"` | Failed
 Select a person using `OFFSET`: `SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"` | Failed
 
