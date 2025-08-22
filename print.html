@@ -409,16 +409,17 @@ CREATE TABLE orders (
 <div style="break-before: page; page-break-before: always;"></div><h1 id="testing-sqlite-on-a-large-dataset"><a class="header" href="#testing-sqlite-on-a-large-dataset">Testing SQLite on a Large Dataset</a></h1>
 <p>To build a large database, the sample <a href="https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip"><code>Chinook</code> database</a> from the <a href="https://www.sqlitetutorial.net">SQLite tutorial</a> was used.</p>
 <p><img src="img/chinook-erd.png" alt="Chinook Entity Relationship Diagram" /></p>
-<p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1115397</code> rows and the DB size has grown to <code>80_106_637_312</code> bytes.</p>
+<p>Before testing, the database was changed to have a typical <code>4096</code> byte page size.</p>
+<p>The <code>customers</code> table was constantly filled with relatively large rows, until the table has reached <code>1001753</code> rows and the DB size has grown to <code>71_248_150_528</code> bytes.</p>
 <p>The <code>first name</code> and <code>last name</code> are generated as a string concatenation: <code>{id}customer_name{id}</code> and <code>{id}customer_last_name{id}</code>, so that all names are unique.</p>
 <h2 id="benchmarks"><a class="header" href="#benchmarks">Benchmarks</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Test</th><th>Cycles cost (first run)</th><th>Cycles cost (second run)</th></tr></thead><tbody>
-<tr><td>Count elements on the first call: <code>SELECT COUNT(*) FROM customers</code></td><td>12392402159</td><td>6205886</td></tr>
-<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email WHERE customer_id=900000</code></td><td>36316014</td><td>84516</td></tr>
-<tr><td>Select by the indexed field first name by the exact match: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "2912169customer_name2912169"</code></td><td>33252345</td><td>62988</td></tr>
-<tr><td>Select by first name, that does not exist: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "1"</code></td><td>30067131</td><td>60316</td></tr>
-<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email FROM customers WHERE customerid&gt;900000 and customerid&lt;900050</code></td><td>63839343</td><td>1821716</td></tr>
-<tr><td>Customer count depending on the <code>first name</code>: <code>SELECT count(*) FROM customers WHERE firstname&gt;="1" and firstname&lt;"2"</code></td><td>6498875034</td><td>254846762</td></tr>
+<tr><td>Count elements on the first call: <code>SELECT COUNT(*) FROM customers</code></td><td>7950194543</td><td>1399546</td></tr>
+<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email WHERE customer_id=900000</code></td><td>38562206</td><td>62421</td></tr>
+<tr><td>Select by the indexed field first name by the exact match: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "2912169customer_name2912169"</code></td><td>35285083</td><td>61988</td></tr>
+<tr><td>Select by first name, that does not exist: <code>SELECT firstname, lastname, email FROM customers WHERE firstname = "1"</code></td><td>32143563</td><td>59929</td></tr>
+<tr><td>Customer search by row ID: <code>SELECT firstname, lastname, email FROM customers WHERE customerid&gt;900000 and customerid&lt;900050</code></td><td>45809516</td><td>740405</td></tr>
+<tr><td>Customer count depending on the <code>first name</code>: <code>SELECT count(*) FROM customers WHERE firstname&gt;="1" and firstname&lt;"2"</code></td><td>6729952521</td><td>361297471</td></tr>
 <tr><td>Select a person that doesn't exist using <code>LIKE</code>: <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code></td><td>Failed</td><td></td></tr>
 <tr><td>Select a person using <code>OFFSET</code>: <code>SELECT firstname, lastname, email FROM customers WHERE firstname LIKE "a%"</code></td><td>Failed</td><td></td></tr>
 </tbody></table>
