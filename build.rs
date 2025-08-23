@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 fn main() {
     // locate wasi builtins
-    let sdk_path = if let Ok(sdk_path) = env::var("WASI_SDK") {
+    let sdk_path = if let Ok(sdk_path) = env::var("WASI_SDK_PATH") {
         sdk_path
     } else {
         "/opt/wasi-sdk".to_string()

@@ -10,10 +10,10 @@ To compile a project with this dependency, you will need to:
 - install wasi2ic: `cargo install wasi2ic`
 - install WASI target: `rustup target add wasm32-wasip1`
 - install WASI-SDK and WASI-oriented clang: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
-- Finally, set the `WASI_SDK` and `PATH` variables:
+- Finally, set the `WASI_SDK_PATH` and `PATH` variables:
 ```bash
-export WASI_SDK=/opt/wasi-sdk
-export PATH=$WASI_SDK/bin:$PATH
+export WASI_SDK_PATH=/opt/wasi-sdk
+export PATH=$WASI_SDK_PATH/bin:$PATH
 ```
 
 You can automate this by launching the preparation script:

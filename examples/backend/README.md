@@ -10,9 +10,9 @@ It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-instal
 
 You also need the WASI-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
 
-If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK`:
+If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK_PATH`:
 ```bash
-export WASI_SDK=/opt/wasi-sdk
+export WASI_SDK_PATH=/opt/wasi-sdk
 ```
 
 Finally, install the `wasi2ic` tool:

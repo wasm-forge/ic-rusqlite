@@ -17,6 +17,6 @@ The script will:
 - download `WASI-SDK` and WASI-oriented `clang`: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
 - Finally, define variables in your `.bashrc`:
 ```sh
-export WASI_SDK=<path to wasi-sdk>
-export PATH=$WASI_SDK/bin:$PATH
+export WASI_SDK_PATH=<path to wasi-sdk>
+export PATH=$WASI_SDK_PATH/bin:$PATH
 ```

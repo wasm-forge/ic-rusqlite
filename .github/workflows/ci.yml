@@ -38,21 +38,21 @@ jobs:
         run: |
           ./prepare.sh -y
 
-          export WASI_SDK=`./prepare.sh --sdk`
+          export WASI_SDK_PATH=`./prepare.sh --sdk`
 
-          echo "WASI_SDK=$WASI_SDK" >> $GITHUB_ENV
+          echo "WASI_SDK_PATH=$WASI_SDK_PATH" >> $GITHUB_ENV
 
-          echo "$WASI_SDK/bin" >> $GITHUB_PATH
+          echo "$WASI_SDK_PATH/bin" >> $GITHUB_PATH
           
       - name: Check clang install
         run: |
           echo `which clang`
           clang --version
 
-      - name: Check WASI_SDK
+      - name: Check WASI_SDK_PATH
         run: |
-          echo WASI_SDK...
-          echo $WASI_SDK
+          echo WASI_SDK_PATH...
+          echo $WASI_SDK_PATH
           echo ...
 
       - name: Build

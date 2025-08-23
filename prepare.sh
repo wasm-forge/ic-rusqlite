@@ -36,10 +36,10 @@ fi
 
   
 export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
-export WASI_SDK=$SDK_DIR/$WASI_DIR
+export WASI_SDK_PATH=$SDK_DIR/$WASI_DIR
 
 if [ "$1" = "--sdk" ]; then
-  echo $WASI_SDK
+  echo $WASI_SDK_PATH
   exit 0
 fi
 
@@ -72,7 +72,7 @@ cargo install wasi2ic
 ##################################
 ############# download WASI-SDK
 
-if [ ! -d "$WASI_SDK" ]; then
+if [ ! -d "$WASI_SDK_PATH" ]; then
 
     echo "Downloading WASI-SDK..."
     
@@ -88,9 +88,9 @@ if [ ! -d "$WASI_SDK" ]; then
 
     [ -f "$SDK_DIR/wasi-sdk.tar.gz" ] && rm "$SDK_DIR/wasi-sdk.tar.gz"
 
-    echo "✅ WASI-SDK installed in: $WASI_SDK ..."
+    echo "✅ WASI-SDK installed in: $WASI_SDK_PATH ..."
 else
-    echo "✅ WASI-SDK found in: $WASI_SDK ..."
+    echo "✅ WASI-SDK found in: $WASI_SDK_PATH ..."
 fi
 
 
@@ -101,8 +101,8 @@ BASHRC="$HOME/.bashrc"
 
 echo "Preparing .bashrc update..."
 
-line1="export WASI_SDK=$WASI_SDK"
-line2='export PATH=$WASI_SDK/bin:$PATH'
+line1="export WASI_SDK_PATH=$WASI_SDK_PATH"
+line2='export PATH=$WASI_SDK_PATH/bin:$PATH'
 
 FOUND1=`grep -F "$line1" "$BASHRC" 2>/dev/null || true`
 FOUND2=`grep -F "$line2" "$BASHRC" 2>/dev/null || true`
@@ -135,7 +135,7 @@ case "$RESPONSE" in
     ;;
   *)
     echo "ℹ️ Skipped modifying .bashrc"
-    echo 'To enable compilation, make sure you point $WASI_SDK to the WASI-SDK installation and ensure the WASI-oriented clang compiler is available on the PATH:'
+    echo 'To enable compilation, make sure you point $WASI_SDK_PATH to the WASI-SDK installation and ensure the WASI-oriented clang compiler is available on the PATH:'
     echo "$line1"
     echo "$line2"
     ;;
