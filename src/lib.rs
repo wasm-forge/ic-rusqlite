@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::cell::RefMut;
 use std::collections::HashMap;
+use std::fs::create_dir_all;
 use std::ops::Range;
 use std::path::Path;
 
@@ -14,7 +15,7 @@ const FS_MEMORY_RANGE: Range<u8> = 101..119;
 const DEFAULT_MOUNTED_DB_ID: u8 = 120;
 
 /// Database file name
-const DEFAULT_DB_FILE_NAME: &str = "/DB/main.db";
+const DEFAULT_DB_FILE_NAME: &str = "./DB/main.db";
 
 // re-export some of the core dependencies for others to use
 pub use ic_wasi_polyfill;
@@ -29,10 +30,10 @@ thread_local! {
         let m = MemoryManager::init(DefaultMemoryImpl::default());
 
         // initialize ic-wasi-polyfill
-        ic_wasi_polyfill::init_with_memory_manager(&[0u8; 32], &[("SQLITE_TMPDIR", "/tmp")], &m, FS_MEMORY_RANGE);
+        ic_wasi_polyfill::init_with_memory_manager(&[0u8; 32], &[("SQLITE_TMPDIR", "tmp")], &m, FS_MEMORY_RANGE);
 
         // add tmp folder
-        let _ = std::fs::create_dir_all("/tmp");
+        let _ = std::fs::create_dir_all("tmp");
 
         RefCell::new(m)
     };
@@ -116,6 +117,42 @@ pub fn set_connection_config(new_setup: ConnectionConfig) {
     });
 }
 
+fn prepare_db_folder(db_file_name: &str) {
+    // create DB folder before mounting and connecting to the database
+    let path = Path::new(db_file_name);
+    let parent = path.parent();
+
+    if let Some(parent) = parent {
+        let res = create_dir_all(parent);
+        if let Err(er) = res {
+            println!("Error creating parent folder {er:?}");
+        }
+    }
+
+    // remove lock if it exists
+    let _ = std::fs::remove_dir_all(format!("{}.lock", db_file_name));
+}
+
+fn remount_db_file(db_file_name: &str, mount_id: Option<u8>) {
+    // unmount old mount, in case it was created before
+    ic_wasi_polyfill::unmount_memory_file(db_file_name);
+
+    if let Some(mount_id) = mount_id {
+        let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(mount_id)));
+
+        // dedicate a virtual memory to the database file
+        let r = ic_wasi_polyfill::mount_memory_file(
+            db_file_name,
+            Box::new(memory),
+            ic_wasi_polyfill::MountedFileSizePolicy::MemoryPages,
+        );
+
+        if r > 0 {
+            println!("Error {r}: failed mounting database file {db_file_name}!");
+        }
+    }
+}
+
 fn create_connection() -> Connection {
     // init file system
     MEMORY_MANAGER.with_borrow(|_m| {
@@ -124,27 +161,13 @@ fn create_connection() -> Connection {
 
     let setup = get_connection_config();
 
-    // unmount old mount, in case it was created
-    ic_wasi_polyfill::unmount_memory_file(&setup.db_file_name);
+    // prepare database folder
+    prepare_db_folder(&setup.db_file_name);
 
-    if let Some(mount_id) = setup.db_file_mount_id {
-        let memory = MEMORY_MANAGER.with_borrow(|m| m.get(MemoryId::new(mount_id)));
+    // try mounting database
+    remount_db_file(&setup.db_file_name, setup.db_file_mount_id);
 
-        // dedicate a virtual memory to the database file
-        ic_wasi_polyfill::mount_memory_file(&setup.db_file_name, Box::new(memory));
-    }
-
-    // remove lock if it exists
-    let _ = std::fs::remove_dir_all(format!("{}.lock", setup.db_file_name));
-
-    // create folder before opening the database
-    let path = Path::new(&setup.db_file_name).parent();
-    if let Some(path) = path {
-        // create containing folder for the database
-        let _ = std::fs::create_dir_all(path);
-    }
-
-    // Create a new connection to the file
+    // Create a new connection to the DB file
     let conn =
         rusqlite::Connection::open(setup.db_file_name).expect("Failed opening the database!");
 

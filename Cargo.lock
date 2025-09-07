@@ -45,9 +45,9 @@ dependencies = [
 
 [[package]]
 name = "bitflags"
-version = "2.9.1"
+version = "2.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967"
+checksum = "2261d10cca569e4643e526d8dc2e62e433cc8aba21ab764233731f8d369bf394"
 
 [[package]]
 name = "block-buffer"
@@ -398,7 +398,7 @@ dependencies = [
 
 [[package]]
 name = "ic-rusqlite"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "candid",
@@ -425,9 +425,9 @@ dependencies = [
 
 [[package]]
 name = "ic-wasi-polyfill"
-version = "0.9.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "689670a02d4cc0e89dbfa35c2e579bc18cfd18a82a76692a02d2a91411804462"
+checksum = "80cd9fe7604444b88b3210cd1b899e525dd255b101b265c2b25106d49311d679"
 dependencies = [
  "anyhow",
  "ic-cdk",
@@ -735,9 +735,9 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "stable-fs"
-version = "0.9.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "739aecb7a9f82f38e855e8405f6cc8368a8c99ff5d75a8eafdb0f3a1e5debb96"
+checksum = "f50a570b7015d096ee0a134f317e98d2f106f1711652459da220fdddb2d68cdc"
 dependencies = [
  "bitflags",
  "ciborium",

@@ -1,6 +1,6 @@
 [package]
 name = "ic-rusqlite"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2024"
 keywords = ["internet-computer", "wasi", "sqlite"]
 description = "The project provides easy-to-use library to enable SQLite in your Internet Computer canister."
@@ -19,7 +19,8 @@ serde = "1.0.164"
 serde_json = "1.0.143"
 
 ic-stable-structures = "0.7.0"
-ic-wasi-polyfill = {version = "0.9.0"}
+ic-wasi-polyfill = {version = "0.11.0"}
+
 
 rusqlite = {version = "0.37.0", features = ["bundled", "wasm32-wasi-vfs"] }
 anyhow = "1.0.99"
