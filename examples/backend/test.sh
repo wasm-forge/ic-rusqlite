@@ -15,3 +15,5 @@ dfx canister call backend insert '(record {name = "person5"; age = 27})'
 dfx canister call backend insert '(record {name = "person6"; age = 28})'
 
 dfx canister call backend query '("select * from person")'
+
+

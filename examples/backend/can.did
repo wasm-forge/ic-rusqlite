@@ -44,4 +44,7 @@ service : {
     "delete": (nat64) -> (Result);
     "update": (UpdateParams) -> (Result);
     "ls_path": (text) -> (vec text);
+
+    db_upload: (offset: nat64, content: blob) -> ();
+    db_download: (offset: nat64) -> (blob) query;
 }

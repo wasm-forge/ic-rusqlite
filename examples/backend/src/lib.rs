@@ -10,13 +10,20 @@ use ic_cdk::query;
 use ic_cdk::update;
 use ic_rusqlite::with_connection;
 
+use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::{Read, Seek, SeekFrom, Write};
+
+const DB_FILENAME: &str = "/my_custom_path/my_base.db";
+const CHUNK_SIZE: usize = 2000000; // 2 MB for uploading and downloading the database
+
 #[init]
 fn init() {
     // default configuration
     let mut config = ic_rusqlite::ConnectionConfig::new();
 
     // optinally, create a custom connection to a database different from the default one
-    config.db_file_name = "/my_custom_path/my_base.db".to_string(); // some custom path to the database
+    config.db_file_name = DB_FILENAME.to_string(); // some custom path to the database
     config.db_file_mount_id = Some(150); // store database in the virtual memory ID 150
     config
         .pragma_settings
@@ -35,6 +42,64 @@ fn pre_upgrade() {
 fn post_upgrade() {
     // same initialization
     init();
+}
+
+// Basic implementation for downloading the database using the icml tool
+// The real implementation should keep canister in "service" mode to prevent database updates during download,
+// also make sure only the owner of the canister can call this method
+#[query]
+fn db_download(offset: u64) -> Vec<u8> {
+    ic_rusqlite::close_connection();
+
+    let mut file = match File::open(DB_FILENAME) {
+        Ok(f) => f,
+        Err(_) => return Vec::new(),
+    };
+
+    // Get file length
+    let file_len = match file.metadata() {
+        Ok(meta) => meta.len(),
+        Err(_) => return Vec::new(),
+    };
+
+    if offset >= file_len {
+        return Vec::new();
+    }
+
+    // Seek to the requested offset
+    if file.seek(SeekFrom::Start(offset)).is_err() {
+        return Vec::new();
+    }
+
+    let mut buffer = Vec::with_capacity(CHUNK_SIZE);
+    let mut handle = file.take(CHUNK_SIZE as u64);
+
+    if handle.read_to_end(&mut buffer).is_err() {
+        return Vec::new();
+    }
+
+    buffer
+}
+
+// Basic implementation to upload the database using the icml tool
+// The real implementation should keep canister in "service" mode to prevent database updates during upload
+// also make sure only the owner of the canister can call this method
+#[update]
+fn db_upload(offset: u64, content: Vec<u8>) {
+    ic_rusqlite::close_connection();
+
+    // open file for writing
+    if let Ok(mut file) = OpenOptions::new()
+        .write(true)
+        .create(true) // create file if it doesn't exist
+        .truncate(true)
+        .open(DB_FILENAME)
+    {
+        if file.seek(SeekFrom::Start(offset)).is_ok() {
+            // write bytes at given offset
+            let _ = file.write_all(&content);
+        }
+    }
 }
 
 #[update]
