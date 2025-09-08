@@ -11,5 +11,9 @@
 
 - [Pragma Settings](pragma_settings.md)
 
+- [Migrations](migrations.md)
+
+- [Database Backup](backup.md)
+
 - [When is SQLite Appropriate?](usecases.md)
 
