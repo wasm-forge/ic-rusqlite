@@ -28,7 +28,7 @@ If your data needs are simple, stable structures may be faster and easier to use
   For simple `key -> value` dictionary search, stable data structures are faster and easier to work with.
 
 - **You need speed over flexibility.**
-  Structures like `Vec` provide O(1) index-based access, and `BTreeMap` gives sorted access with logarithmic complexity — both are faster than SQLite for many common tasks.
+  Structures like `Vec` provide fast access to an array of elements, and `BTreeMap` gives sorted element access with logarithmic complexity.
 
 ## When to Use the File System
 
