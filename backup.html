@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>When is SQLite Appropriate? - Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</title>
+        <title>Database Backup - Enabling SQLite in canisters with &#x60;ic-ruslite&#x60;</title>
 
 
         <!-- Custom HTML head -->
@@ -159,67 +159,36 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="when-is-sqlite-appropriate"><a class="header" href="#when-is-sqlite-appropriate">When Is SQLite Appropriate?</a></h1>
-<p>SQLite is a fast, lightweight SQL database that stores all data in a single file. This works well with a canister's memory model, but there are pros and cons to consider before choosing it.</p>
-<h2 id="when-to-use-sqlite"><a class="header" href="#when-to-use-sqlite">When to Use SQLite</a></h2>
-<p>SQLite is ideal when you need structured, reliable, and transactional data storage but don’t want the complexity of running a database server.</p>
-<ul>
-<li>
-<p><strong>You need complex queries.</strong>
-SQLite supports standard SQL, allowing you to perform advanced queries using <code>SELECT</code>, <code>JOIN</code>, <code>GROUP BY</code>, and other operations.</p>
-</li>
-<li>
-<p><strong>You need transactions.</strong>
-SQLite is ACID-compliant, so it guarantees data consistency, supports rollback, and handles multi-step operations safely.</p>
-</li>
-<li>
-<p><strong>Tabular data with multiple indexes.</strong>
-SQLite is useful, if you have a large table and you want to find records by multiple indexed fields.</p>
-</li>
-</ul>
-<h2 id="when-to-use-stable-structures"><a class="header" href="#when-to-use-stable-structures">When to Use Stable Structures</a></h2>
-<p>If your data needs are simple, stable structures may be faster and easier to use.</p>
-<p><strong>Use a stable structure like <code>Vec</code>, <code>BTreeMap</code>, or <code>BTreeSet</code> when:</strong></p>
-<ul>
-<li>
-<p><strong>You don’t need transactions.</strong>
-If you don’t need rollback or atomic updates.</p>
-</li>
-<li>
-<p><strong>You don’t need SQL-style queries.</strong>
-For simple <code>key -&gt; value</code> dictionary search, stable data structures are faster and easier to work with.</p>
-</li>
-<li>
-<p><strong>You need speed over flexibility.</strong>
-Structures like <code>Vec</code> provide fast access to an array of elements, and <code>BTreeMap</code> gives sorted element access with logarithmic complexity.</p>
-</li>
-</ul>
-<h2 id="when-to-use-the-file-system"><a class="header" href="#when-to-use-the-file-system">When to Use the File System</a></h2>
-<p>For file-based hierarchical data, the file system may be the best choice.</p>
-<p><strong>Use the file system storage when:</strong></p>
-<ul>
-<li>
-<p><strong>You want to organize data into directories and subfolders.</strong>
-Storing backups and documents.</p>
-</li>
-<li>
-<p><strong>You work with large data.</strong>
-Files are larger than the canister's heap memory and/or contain large sections of zeroed memory (<a href="https://en.wikipedia.org/wiki/Sparse_file">sparse files</a>).</p>
-</li>
-<li>
-<p><strong>You perform byte-level data manipulation.</strong>
-Editing or seeking within large files is faster with standard file I/O than loading and modifying data through an SQL database.</p>
-</li>
-</ul>
+                        <h1 id="backup-and-recover"><a class="header" href="#backup-and-recover">Backup and Recover</a></h1>
+<h1 id="download-and-uploading-the-database"><a class="header" href="#download-and-uploading-the-database">Download and Uploading the Database</a></h1>
+<p>To create a backup of your database, you can use the <a href="https://crates.io/crates/icml"><code>icml</code></a> tool. The <code>download</code> command lets you save the canister’s database to your local drive.</p>
+<p>Later, you can restore it by uploading the database back with the <code>upload</code> command.</p>
+<p>By downloading and uploading the database it should be also possible to move the database from one canister to another.</p>
+<div id="admonition-do-not-read-or-write-database-with-connections-open" class="admonition admonish-warning" role="note" aria-labelledby="admonition-do-not-read-or-write-database-with-connections-open-title">
+<div class="admonition-title">
+<div id="admonition-do-not-read-or-write-database-with-connections-open-title">
+<p>Do not read or write database with connections open</p>
+</div>
+<a class="admonition-anchor-link" href="#admonition-do-not-read-or-write-database-with-connections-open"></a>
+</div>
+<div>
+<p>Before running <code>download</code> or <code>upload</code>, the canister's database connection must be closed. This ensures that the cached pages of the SQLite engine do not conflict with the database written on disk and your database does not get corrupted.</p>
+</div>
+</div>
+<h1 id="recovering-from-a-canister-snapshot"><a class="header" href="#recovering-from-a-canister-snapshot">Recovering from a Canister Snapshot</a></h1>
+<p>If a canister becomes unusable and its functions cannot be called, but you can still create and download a snapshot, <code>icml</code> can recover the SQLite database directly from the stable memory snapshot file.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="backup.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="migrations.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="usecases.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -227,10 +196,13 @@ Editing or seeking within large files is faster with standard file I/O than load
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="backup.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="migrations.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="usecases.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
