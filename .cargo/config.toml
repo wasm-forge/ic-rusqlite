@@ -1,3 +1,2 @@
 [env]
 SQLITE3_LIB_DIR = {value = "lib", relative=true}
-cc = {value = "lib/fake-cc", relative=true}

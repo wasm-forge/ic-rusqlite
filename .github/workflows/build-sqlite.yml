@@ -48,6 +48,9 @@ jobs:
           echo WASI_SDK_PATH...
           echo $WASI_SDK_PATH
           echo ...
+
+      - name: Unzip
+        run: unzip lib/scr.zip -d lib
       
       - name: Build sqlite3 for WASI
         run: |
