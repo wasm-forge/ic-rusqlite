@@ -3,44 +3,65 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    // locate wasi builtins
-    let sdk_path = if let Ok(sdk_path) = env::var("WASI_SDK_PATH") {
-        sdk_path
-    } else {
-        "/opt/wasi-sdk".to_string()
-    };
+    let bundled = std::env::var("CARGO_FEATURE_BUNDLED").is_ok();
+    let precompiled = std::env::var("CARGO_FEATURE_PRECOMPILED").is_ok();
 
-    let sysroot = format!("{sdk_path}/share/wasi-sysroot");
-    println!("cargo:rustc-env=WASI_SYSROOT={sysroot}",);
+    if bundled && precompiled {
+        panic!("Features `bundled` and `precompiled` cannot be enabled at the same time.");
+    }
 
-    let pattern = format!("{sdk_path}/lib/clang/*/lib/*wasip1");
+    if !bundled && !precompiled {
+        panic!("Features either `bundled` or `precompiled` must be enabled.");
+    }
 
-    let paths: Vec<PathBuf> = glob(&pattern)
-        .expect("Failed to read glob pattern")
-        .filter_map(Result::ok)
-        .collect();
+    if precompiled {
+        let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+        let lib_dir = manifest_dir.join("lib");
 
-    if let Some(path) = paths.last() {
-        // use the latest version that we have found
-        println!("cargo:rustc-link-search={}", path.display());
+        println!("cargo:rustc-link-search=native={}", lib_dir.display());
+        println!("cargo:rustc-link-lib=static=sqlite3");
+    }
 
-        let builtins: Vec<PathBuf> = glob(&format!("{}/*", path.display()))
+    if bundled {
+        // locate WASI builtins
+        let sdk_path = if let Ok(sdk_path) = env::var("WASI_SDK_PATH") {
+            sdk_path
+        } else {
+            "/opt/wasi-sdk".to_string()
+        };
+
+        let sysroot = format!("{sdk_path}/share/wasi-sysroot");
+        println!("cargo:rustc-env=WASI_SYSROOT={sysroot}",);
+
+        let pattern = format!("{sdk_path}/lib/clang/*/lib/*wasip1");
+
+        let paths: Vec<PathBuf> = glob(&pattern)
             .expect("Failed to read glob pattern")
             .filter_map(Result::ok)
             .collect();
 
-        if let Some(b) = builtins.first() {
-            let name = b
-                .file_stem()
-                .expect("builtins not found")
-                .to_string_lossy()
-                .to_string();
+        if let Some(path) = paths.last() {
+            // use the latest version that we have found
+            println!("cargo:rustc-link-search={}", path.display());
 
-            println!("cargo:rustc-link-arg=-l{}", &name[3..]);
+            let builtins: Vec<PathBuf> = glob(&format!("{}/*", path.display()))
+                .expect("Failed to read glob pattern")
+                .filter_map(Result::ok)
+                .collect();
+
+            if let Some(b) = builtins.first() {
+                let name = b
+                    .file_stem()
+                    .expect("builtins not found")
+                    .to_string_lossy()
+                    .to_string();
+
+                println!("cargo:rustc-link-arg=-l{}", &name[3..]);
+            } else {
+                panic!("Could not find clang wasm32 builtins under '{pattern}'");
+            }
         } else {
             panic!("Could not find clang wasm32 builtins under '{pattern}'");
         }
-    } else {
-        panic!("Could not find clang wasm32 builtins under '{pattern}'");
     }
 }

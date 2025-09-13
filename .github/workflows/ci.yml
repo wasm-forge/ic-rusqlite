@@ -54,7 +54,42 @@ jobs:
           echo WASI_SDK_PATH...
           echo $WASI_SDK_PATH
           echo ...
+      
+      - name: Build sqlite3 for WASI
+        run: |
+          
+          clang --target=wasm32-wasip1 \
+                -O3 -c lib/sqlite3.c -o lib/sqlite3.o \
+                -DSQLITE_CORE -DSQLITE_DEFAULT_FOREIGN_KEYS=1 \
+                -DSQLITE_ENABLE_API_ARMOR -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_DBSTAT_VTAB \
+                -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+                -DSQLITE_ENABLE_LOAD_EXTENSION=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT -DSQLITE_ENABLE_RTREE \
+                -DSQLITE_ENABLE_STAT4 -DSQLITE_SOUNDEX -DSQLITE_THREADSAFE=1 -DSQLITE_USE_URI \
+                -DHAVE_USLEEP=1 -DHAVE_ISNAN -D_POSIX_THREAD_SAFE_FUNCTIONS \
+                -DHAVE_LOCALTIME_R -USQLITE_THREADSAFE -DSQLITE_THREADSAFE=0 -DLONGDOUBLE_TYPE=double \
+                -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_GETPID -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS \
 
-      - name: Build
+          clang --target=wasm32-wasip1 \
+                -O3 -c lib/wasm32-wasi-vfs.c -o lib/wasm32-wasi-vfs.o \
+                -DSQLITE_ENABLE_API_ARMOR -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_DBSTAT_VTAB \
+                -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+                -DSQLITE_ENABLE_LOAD_EXTENSION=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT -DSQLITE_ENABLE_RTREE \
+                -DSQLITE_ENABLE_STAT4 -DSQLITE_SOUNDEX -DSQLITE_THREADSAFE=1 -DSQLITE_USE_URI \
+                -DHAVE_USLEEP=1 -DHAVE_ISNAN -D_POSIX_THREAD_SAFE_FUNCTIONS \
+                -DHAVE_LOCALTIME_R -USQLITE_THREADSAFE -DSQLITE_THREADSAFE=0 -DLONGDOUBLE_TYPE=double \
+                -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_GETPID -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS
+
+          ar rcs lib/libsqlite3.a lib/sqlite3.o lib/wasm32-wasi-vfs.o      
+
+      - name: Upload libsqlite3.a
+        uses: actions/upload-artifact@v4
+        with:
+          name: libsqlite3
+          path: lib/libsqlite3.a
+
+      - name: Build bundled
         run: cargo build --release --target wasm32-wasip1
+        
+      - name: Build precompiled
+        run: cargo build --release --target wasm32-wasip1 --features=precompiled
         
