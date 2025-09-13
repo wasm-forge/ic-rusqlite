@@ -1,33 +1,82 @@
-name: Build SQLite for WASI
+name: Tests
 
 on:
-  workflow_dispatch: # run manually
-  push:
-    tags:
-      - "v*"
+  [push]
+
+env:
+  CARGO_TERM_COLOR: always
+  TERM: xterm-256color
 
 jobs:
-  build-sqlite-wasi:
-    runs-on: ubuntu-latest
-    container: ghcr.io/webassembly/wasi-sdk:sha-d90d7de@sha256:ad430eedb6c51fecf657685d7ef538a9677cc937b47f2799ba14e6a487ad334b
+
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+
+
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.rust }} --no-self-update
+          rustup default ${{ matrix.rust }}
+
+      - name: Download WASI-SDK and wasi2ic
+        run: |
+          ./prepare.sh -y
+
+          export WASI_SDK_PATH=`./prepare.sh --sdk`
+
+          echo "WASI_SDK_PATH=$WASI_SDK_PATH" >> $GITHUB_ENV
+
+          echo "$WASI_SDK_PATH/bin" >> $GITHUB_PATH
+          
+      - name: Check clang install
+        run: |
+          echo `which clang`
+          clang --version
+
+      - name: Check WASI_SDK_PATH
+        run: |
+          echo WASI_SDK_PATH...
+          echo $WASI_SDK_PATH
+          echo ...
+      
       - name: Build sqlite3 for WASI
         run: |
-          mkdir -p build/wasi
-          clang --sysroot=/wasi-sdk-20/share/wasi-sysroot \
-                --target=wasm32-wasip1 \
-                -O2 -c vendor/sqlite/sqlite3.c -o build/wasi/sqlite3.o \
-                -DSQLITE_CORE \
-                -DSQLITE_THREADSAFE=0 \
-                -DSQLITE_OMIT_LOAD_EXTENSION=1 \
-                -DSQLITE_DEFAULT_FOREIGN_KEYS=1
-          ar rcs build/wasi/libsqlite3.a build/wasi/sqlite3.o
+          
+          clang --target=wasm32-wasip1 \
+                -O3 -c lib/sqlite3.c -o lib/sqlite3.o \
+                -DSQLITE_CORE -DSQLITE_DEFAULT_FOREIGN_KEYS=1 \
+                -DSQLITE_ENABLE_API_ARMOR -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_DBSTAT_VTAB \
+                -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+                -DSQLITE_ENABLE_LOAD_EXTENSION=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT -DSQLITE_ENABLE_RTREE \
+                -DSQLITE_ENABLE_STAT4 -DSQLITE_SOUNDEX -DSQLITE_THREADSAFE=1 -DSQLITE_USE_URI \
+                -DHAVE_USLEEP=1 -DHAVE_ISNAN -D_POSIX_THREAD_SAFE_FUNCTIONS \
+                -DHAVE_LOCALTIME_R -USQLITE_THREADSAFE -DSQLITE_THREADSAFE=0 -DLONGDOUBLE_TYPE=double \
+                -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_GETPID -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS \
 
-      - name: Upload libsqlite3.a as artifact
+          clang --target=wasm32-wasip1 \
+                -O3 -c lib/wasm32-wasi-vfs.c -o lib/wasm32-wasi-vfs.o \
+                -DSQLITE_ENABLE_API_ARMOR -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_DBSTAT_VTAB \
+                -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+                -DSQLITE_ENABLE_LOAD_EXTENSION=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT -DSQLITE_ENABLE_RTREE \
+                -DSQLITE_ENABLE_STAT4 -DSQLITE_SOUNDEX -DSQLITE_THREADSAFE=1 -DSQLITE_USE_URI \
+                -DHAVE_USLEEP=1 -DHAVE_ISNAN -D_POSIX_THREAD_SAFE_FUNCTIONS \
+                -DHAVE_LOCALTIME_R -USQLITE_THREADSAFE -DSQLITE_THREADSAFE=0 -DLONGDOUBLE_TYPE=double \
+                -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_GETPID -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS
+
+          ar rcs lib/libsqlite3.a lib/sqlite3.o lib/wasm32-wasi-vfs.o      
+
+      - name: Upload libsqlite3.a
         uses: actions/upload-artifact@v4
         with:
-          name: libsqlite3-wasi
-          path: build/wasi/libsqlite3.a
+          name: libsqlite3
+          path: lib/libsqlite3.a
