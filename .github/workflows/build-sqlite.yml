@@ -75,8 +75,14 @@ jobs:
 
           ar rcs lib/libsqlite3.a lib/sqlite3.o lib/wasm32-wasi-vfs.o      
 
+      - name: Compute SHA256
+        run: |
+          sha256sum lib/libsqlite3.a > lib/libsqlite3.a.sha256
+
       - name: Upload libsqlite3.a
         uses: actions/upload-artifact@v4
         with:
           name: libsqlite3
-          path: lib/libsqlite3.a
+          path: |
+            lib/libsqlite3.a
+            lib/libsqlite3.a.sha256
