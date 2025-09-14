@@ -7,6 +7,9 @@ description = "The project provides easy-to-use library to enable SQLite in your
 license = "MIT"
 repository = "https://github.com/wasm-forge/ic-rusqlite"
 
+include = [
+    "lib/*.a*",
+]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -33,8 +36,8 @@ env = "1.0"
 [features]
 default = ["bundled"]
 
-# Activate this option to compile the sqlite3 from the source code
+# Activate this feature to compile the sqlite3 from source code
 bundled = ["rusqlite", "rusqlite/bundled", "rusqlite/wasm32-wasi-vfs"]
 
-# Activate this option to link a precompiled version of sqlite3
+# Activate this feature to link a precompiled version of sqlite3
 precompiled = ["rusqlite"]

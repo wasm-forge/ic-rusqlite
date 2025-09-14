@@ -9,6 +9,12 @@ It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-instal
 To compile a project with this dependency, you will need to:
 - install wasi2ic: `cargo install wasi2ic`
 - install WASI target: `rustup target add wasm32-wasip1`
+
+
+## Compiling 
+
+If you intend to compile the SQLite from the source, you will need to install WASI-SDK:
+
 - install WASI-SDK and WASI-oriented clang: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
 - Finally, set the `WASI_SDK_PATH` and `PATH` variables:
 ```bash
@@ -21,15 +27,22 @@ You can automate this by launching the preparation script:
 curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare.sh | sh
 ```
 
-
-## Developing casniter
-
-To enable `rusqlite` in your canister, add the helper dependency into your backend canister:
+Finally, to enable `rusqlite` in your canister, add the helper dependency into your backend canister:
 ```bash
 cargo add ic-rusqlite
 ```
 
-You will also need to update the `dfx.json` to specify path to `wasm`, set `type` to `custom`, and 
+## Using Precompiled SQLite
+
+If you don't want to install `WASI-SDK`, you can use the precompiled SQLite version for WASI, just activate the `precompiled` feature and disable the default features:
+```sh
+cargo add ic-rusqlite --no-default-features --features precompiled
+```
+
+## Developing casniter
+
+
+You will need to update the `dfx.json` to specify path to `wasm`, set `type` to `custom`, and 
 specify custom build steps to enforce compilation to the `wasm32-wasip1` target. 
 Finally, use `wasi2ic` to produce wasm executable on the Internet Computer.
 

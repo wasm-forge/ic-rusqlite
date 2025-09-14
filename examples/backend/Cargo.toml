@@ -13,10 +13,9 @@ ic-cdk = "0.18.5"
 
 
 # Use this option to compile sqlite3.c, you will need to install WASI-SDK
-ic-rusqlite = { path = "../../../ic-rusqlite"}
+#ic-rusqlite = { path = "../../../ic-rusqlite"}
 
-# Use this option to link a precompiled sqlite3.c that is found in distributed with this create
-#ic-rusqlite = { path = "../../../ic-rusqlite", default-features = false, features = ["precompiled"] }
+# Use this option to link a precompiled version of sqlite3.c for WASI
+ic-rusqlite = { path = "../../../ic-rusqlite", default-features = false, features = ["precompiled"] }
 
-serde = { version = "1", features = ["derive"] }
-serde_json = "1.0"
+#serde = { version = "1", features = ["derive"] }
