@@ -6,6 +6,5 @@ Cargo.lock
 .idea/
 patches/
 
-lib/*.a
 lib/*.o
 
