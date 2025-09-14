@@ -20,6 +20,7 @@ fn main() {
 
         println!("cargo:rustc-link-search=native={}", lib_dir.display());
         println!("cargo:rustc-link-lib=static=sqlite3");
+        println!("cargo:rerun-if-changed=lib/libsqlite3.a");
     }
 
     if bundled {
