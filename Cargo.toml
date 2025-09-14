@@ -8,7 +8,10 @@ license = "MIT"
 repository = "https://github.com/wasm-forge/ic-rusqlite"
 
 include = [
+    "src/**",
     "lib/*.a*",
+    "Cargo.toml",
+    "README.md",
 ]
 
 [lib]
