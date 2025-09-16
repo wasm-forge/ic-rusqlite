@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  [push]
+
+env:
+  CARGO_TERM_COLOR: always
+  TERM: xterm-256color
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-latest
+            arch: arm64
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
+
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.rust }} --no-self-update
+          rustup default ${{ matrix.rust }}
+
+      - name: Install wasi2ic and wasm32-wasip1
+        run: |
+          rustup target add wasm32-wasip1
+          cargo install wasi2ic
+
+      - name: Build example
+        run: |
+          cd examples/backend
+          cargo build --release --target wasm32-wasip1
