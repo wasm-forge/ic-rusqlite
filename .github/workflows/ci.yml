@@ -56,4 +56,4 @@ jobs:
           echo ...
 
       - name: Build bundled
-        run: cargo build --release --target wasm32-wasip1
+        run: cargo build --release --target wasm32-wasip1 --features=bundled
