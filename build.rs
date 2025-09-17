@@ -7,11 +7,15 @@ fn main() {
     let precompiled = std::env::var("CARGO_FEATURE_PRECOMPILED").is_ok();
 
     if bundled && precompiled {
-        panic!("Features `bundled` and `precompiled` cannot be enabled at the same time.");
+        panic!(
+            "Features `bundled` and `precompiled` cannot be enabled at the same time.\nEnable `bundled` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
+        );
     }
 
     if !bundled && !precompiled {
-        panic!("Features either `bundled` or `precompiled` must be enabled.");
+        panic!(
+            "Features either `bundled` or `precompiled` must be enabled.\nEnable `bundled` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
+        );
     }
 
     if precompiled {

@@ -1,6 +1,6 @@
 [package]
 name = "ic-rusqlite"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2024"
 keywords = ["internet-computer", "wasi", "sqlite"]
 description = "The project provides easy-to-use library to enable SQLite in your Internet Computer canister."
@@ -38,7 +38,6 @@ glob = "0.3.3"
 env = "1.0"
 
 [features]
-default = ["bundled"]
 
 # Activate this feature to compile the sqlite3 from source code
 bundled = ["rusqlite", "rusqlite/bundled", "rusqlite/wasm32-wasi-vfs"]
