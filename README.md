@@ -11,12 +11,12 @@ To compile a project with this dependency, you will need to:
 - install WASI target: `rustup target add wasm32-wasip1`
 
 
-## Compiling 
+## Compiling SQLite
 
 If you intend to compile the SQLite from the source, you will need to install WASI-SDK:
 
 - install WASI-SDK and WASI-oriented clang: [WASI-SDK](https://github.com/WebAssembly/wasi-sdk/releases/). 
-- Finally, set the `WASI_SDK_PATH` and `PATH` variables:
+- set the `WASI_SDK_PATH` and `PATH` variables:
 ```bash
 export WASI_SDK_PATH=/opt/wasi-sdk
 export PATH=$WASI_SDK_PATH/bin:$PATH
@@ -39,8 +39,7 @@ If you don't want to install `WASI-SDK`, you can use the precompiled SQLite vers
 cargo add ic-rusqlite --no-default-features --features precompiled
 ```
 
-## Developing casniter
-
+## Developing Canister
 
 You will need to update the `dfx.json` to specify path to `wasm`, set `type` to `custom`, and 
 specify custom build steps to enforce compilation to the `wasm32-wasip1` target. 
@@ -71,7 +70,7 @@ Example:
 }
 ```
 
-## Example use in your Rust code
+## Example
 
 Finally, use the `with_connection()` function to access your database:
 
@@ -101,9 +100,9 @@ Finally, use the `with_connection()` function to access your database:
     //...
 ```
 
-## Further examples
+## Further Examples
 
 You can find a small example in the `"examples/backend"` folder.
 
-For more detailed explanations, see the `ic-rusqlite` [book](https://wasm-forge.github.io/ic-rusqlite/).
+For more detailed explanations, see the [`ic-rusqlite` book](https://wasm-forge.github.io/ic-rusqlite/).
 
