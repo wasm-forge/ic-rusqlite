@@ -1,4 +1,4 @@
-name: Build sqlite
+name: Build sqlite from source
 
 on:
   [push]

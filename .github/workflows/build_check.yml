@@ -1,4 +1,4 @@
-name: Build check
+name: Check build without WASI-SDK
 
 on:
   [push]
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build example
         run: |
-          cd example/backend
+          cd examples/backend
           dfx start --clean --background
           dfx deploy
           ./test.sh
