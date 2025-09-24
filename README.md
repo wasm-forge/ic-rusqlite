@@ -11,6 +11,13 @@ To compile a project with this dependency, you will need to:
 - install WASI target: `rustup target add wasm32-wasip1`
 
 
+## Using Precompiled SQLite
+
+If you don't want to install `WASI-SDK`, you can use the precompiled SQLite version for WASI, just activate the `precompiled` feature and disable the default features:
+```sh
+cargo add ic-rusqlite --features precompiled
+```
+
 ## Compiling SQLite
 
 If you intend to compile the SQLite from the source, you will need to install WASI-SDK:
@@ -29,14 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/wasm-forge/ic-rusqlite/main/prepare
 
 Finally, to enable `rusqlite` in your canister, add the helper dependency into your backend canister:
 ```bash
-cargo add ic-rusqlite
-```
-
-## Using Precompiled SQLite
-
-If you don't want to install `WASI-SDK`, you can use the precompiled SQLite version for WASI, just activate the `precompiled` feature and disable the default features:
-```sh
-cargo add ic-rusqlite --no-default-features --features precompiled
+cargo add ic-rusqlite --features compile_sqlite
 ```
 
 ## Developing Canister

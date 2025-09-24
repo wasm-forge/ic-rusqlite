@@ -22,7 +22,7 @@ fn init() {
     // default configuration
     let mut config = ic_rusqlite::ConnectionConfig::new();
 
-    // optinally, create a custom connection to a database different from the default one
+    // optionally, create a custom connection to a database different from the default one
     config.db_file_name = DB_FILENAME.to_string(); // some custom path to the database
     config.db_file_mount_id = Some(150); // store database in the virtual memory ID 150
     config

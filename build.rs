@@ -3,18 +3,25 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    let bundled = std::env::var("CARGO_FEATURE_BUNDLED").is_ok();
+    let compile_sqlite = std::env::var("CARGO_FEATURE_COMPILE_SQLITE").is_ok();
     let precompiled = std::env::var("CARGO_FEATURE_PRECOMPILED").is_ok();
 
-    if bundled && precompiled {
+    // Figure out the target triple (host vs. wasm)
+    let target = env::var("TARGET").unwrap();
+
+    if !target.starts_with("wasm32") {
+        panic!("Targets other than WASM32 are not supported!");
+    }
+
+    if compile_sqlite && precompiled {
         panic!(
-            "Features `bundled` and `precompiled` cannot be enabled at the same time.\nEnable `bundled` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
+            "Features `compile_sqlite` and `precompiled` cannot be enabled at the same time.\nEnable `compile_sqlite` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
         );
     }
 
-    if !bundled && !precompiled {
+    if !compile_sqlite && !precompiled {
         panic!(
-            "Features either `bundled` or `precompiled` must be enabled.\nEnable `bundled` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
+            "Features either `compile_sqlite` or `precompiled` must be enabled.\nEither enable `compile_sqlite` if you want to compile sqlite3 from source, enable `precompiled` if you want to link the precompiled version."
         );
     }
 
@@ -24,10 +31,10 @@ fn main() {
 
         println!("cargo:rustc-link-search=native={}", lib_dir.display());
         println!("cargo:rustc-link-lib=static=sqlite3");
-        println!("cargo:rerun-if-changed=lib/libsqlite3.a");
+        println!("cargo:rerun-if-changed={}/libsqlite3.a", lib_dir.display());
     }
 
-    if bundled {
+    if compile_sqlite {
         // locate WASI builtins
         let sdk_path = if let Ok(sdk_path) = env::var("WASI_SDK_PATH") {
             sdk_path

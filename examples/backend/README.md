@@ -7,25 +7,21 @@ Build a basic example of using SQLite in an IC Canister.
 
 It is assumed that you have [rust](https://doc.rust-lang.org/book/ch01-01-installation.html), [dfx](https://internetcomputer.org/docs/current/developer-docs/setup/install/).
 
-
-You also need the WASI-oriented [clang](https://github.com/WebAssembly/wasi-sdk/releases/) installation. 
-
-If your WASI installation is in a different folder, assign it to environment variable `WASI_SDK_PATH`:
-```bash
-export WASI_SDK_PATH=/opt/wasi-sdk
-```
-
-Finally, install the `wasi2ic` tool:
+Install the `wasi2ic` tool:
 ```bash
 cargo install wasi2ic
 ```
 
 ## Build and Deploy
 
-To build and deploy the example canister, start the build script:
-
+Run dfx:
 ```bash
-build.sh
+dfx start --clean --background
+```
+
+Deploy the example canister:
+```bash
+dfx deploy
 ```
 
 ## Test
