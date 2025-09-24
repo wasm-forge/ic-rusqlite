@@ -60,6 +60,7 @@ jobs:
         run: |
           cd examples/backend
           dfx start --clean --background
+          dfx canister create --all
           cargo build --release --target wasm32-wasip1 --no-default-features --features compile_sqlite
           wasi2ic target/wasm32-wasip1/release/backend.wasm target/wasm32-wasip1/release/backend_nowasi.wasm
           dfx canister install --mode reinstall --wasm target/wasm32-wasip1/release/backend_nowasi.wasm -y backend
