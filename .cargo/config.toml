@@ -1,2 +1,6 @@
+[build]
+target = "wasm32-wasip1"
+
 [env]
 SQLITE3_LIB_DIR = {value = "lib", relative=true}
+
