@@ -25,8 +25,7 @@ jobs:
 
       - name: Install Rust
         run: |
-          rustup update ${{ matrix.rust }} --no-self-update
-          rustup default ${{ matrix.rust }}
+          rustup update
 
       - name: Download WASI-SDK and wasi2ic
         run: |

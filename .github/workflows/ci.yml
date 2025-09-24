@@ -30,8 +30,7 @@ jobs:
 
       - name: Install Rust
         run: |
-          rustup update ${{ matrix.rust }} --no-self-update
-          rustup default ${{ matrix.rust }}
+          rustup update
 
       - name: Install dfx
         uses: dfinity/setup-dfx@main
