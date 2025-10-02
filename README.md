@@ -41,7 +41,7 @@ cargo add ic-rusqlite --features compile_sqlite
 
 ## Developing Canister
 
-You will need to update the `dfx.json` to specify path to `wasm`, set `type` to `custom`, and 
+You will need to update the `dfx.json` and specify path to `wasm`, set `type` to `custom`, and 
 specify custom build steps to enforce compilation to the `wasm32-wasip1` target. 
 Finally, use `wasi2ic` to produce wasm executable on the Internet Computer.
 
@@ -65,14 +65,13 @@ Example:
       ]
     }
   },
-  "dfx": "0.28.0",
   "version": 1
 }
 ```
 
 ## Example
 
-Finally, use the `with_connection()` function to access your database:
+Use the `with_connection()` function to access your database:
 
 ```rust
     //...
@@ -96,13 +95,12 @@ Finally, use the `with_connection()` function to access your database:
 
     })
 
-
     //...
 ```
 
 ## Further Examples
 
-You can find a small example in the `"examples/backend"` folder.
+* A minimal example is available in the `"examples/backend"` folder.
+* Also see the [demo Svelte canister](https://github.com/wasm-forge/ic-sqlite-svelte-demo).
 
 For more detailed explanations, see the [`ic-rusqlite` book](https://wasm-forge.github.io/ic-rusqlite/).
-

@@ -22,15 +22,14 @@ jobs:
     env:
       MDBOOK_VERSION: 0.4.48
       MDBOOK_ADMONISH_VERSION: 1.19.0
-      MDBOOK_LINKCHECK_VERSION: 0.7.7
-      RUST_VERSION: 1.84.0 # Use the same version as in `rust-toolchain.toml`
+      MDBOOK_LINKCHECK_VERSION: 0.7.7      
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Rust
         run: |
-          rustup update ${RUST_VERSION} --no-self-update
-          rustup default ${RUST_VERSION}
+          rustup update --no-self-update
+          rustup default 
           rustup target add wasm32-unknown-unknown
 
       - name: Install mdbook
