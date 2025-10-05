@@ -193,12 +193,18 @@
 export PATH=$WASI_SDK_PATH/bin:$PATH
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="creating-your-sqlite-canister"><a class="header" href="#creating-your-sqlite-canister">Creating Your SQLite Canister</a></h1>
-<h2 id="configure-your-canister"><a class="header" href="#configure-your-canister">Configure your canister</a></h2>
+<h2 id="add-dependency-for-the-precompiled-sqlite-binary"><a class="header" href="#add-dependency-for-the-precompiled-sqlite-binary">Add dependency for the precompiled SQLite binary</a></h2>
 <p>To integrate SQLite into your backend Rust Canister project, you will need to add the <code>ic-rusqlite</code> dependency and adjust the build process.</p>
 <p>The first part is easy:</p>
-<pre><code class="language-bash">cargo add ic-rusqlite
+<pre><code class="language-bash">cargo add ic-rusqlite --features precompiled
 </code></pre>
-<p>The second part requires you to update the <code>dfx.json</code> to specify path to <code>wasm</code> binary, set cansiter <code>type</code> to <code>custom</code>, and
+<h2 id="add-dependency-for-compiling-sqlite-from-source"><a class="header" href="#add-dependency-for-compiling-sqlite-from-source">Add dependency for compiling SQLite from source</a></h2>
+<p>To integrate SQLite into your backend Rust Canister project, you will need to add the <code>ic-rusqlite</code> dependency and adjust the build process.</p>
+<p>The first part is easy:</p>
+<pre><code class="language-bash">cargo add ic-rusqlite --features compile_sqlite
+</code></pre>
+<h2 id="configure-your-canister"><a class="header" href="#configure-your-canister">Configure your canister</a></h2>
+<p>The second part requires you to update the <code>dfx.json</code> to specify path to <code>wasm</code> binary, set canister <code>type</code> to <code>custom</code>, and
 specify custom build steps to enforce compilation to the <code>wasm32-wasip1</code> target.
 Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet Computer.</p>
 <p>Example <code>dfx.json</code>:</p>
@@ -224,10 +230,10 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
   "version": 1
 }
 </code></pre>
-<h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the Database</a></h2>
+<h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the database</a></h2>
 <p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so there is no need to explicitly initialize or create a database.</p>
 <p>Internally, the <code>ic-rusqlite</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system.</p>
-<p>The virtual memory with the ID <code>120</code> is the default storage memory for the database database file is <code>/DB/main.db</code>. These settings are default, but can be change via the <code>set_connection_config(...)</code> function.</p>
+<p>The database database file is <code>/DB/main.db</code>, it is configured for be stored in the Virtual Memory <code>120</code>. These settings are default, but can be change via the <code>set_connection_config(...)</code> function.</p>
 <div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
 <div id="admonition-note-title">
@@ -239,7 +245,7 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <p>The ability to associate a file with a virtual memory is a special feature of <a href="https://github.com/wasm-forge/stable-fs"><code>stable-fs</code></a>. This allows to create dedicated files with fast I/O access.</p>
 </div>
 </div>
-<h2 id="using-file-system"><a class="header" href="#using-file-system">Using File System</a></h2>
+<h2 id="using-the-file-system"><a class="header" href="#using-the-file-system">Using the file system</a></h2>
 <p><code>ic-rusqlite</code> is compiled to the WASI target and then processed by the <a href="https://github.com/wasm-forge/wasi2ic"><code>wasi2ic</code> workflow</a>, embedding <code>ic-wasi-polyfill</code> and <code>stable-fs</code> into the output binary. This enables the use of standard Rust I/O APIs for file operations.</p>
 <div id="admonition-note-1" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-1-title">
 <div class="admonition-title">
@@ -249,10 +255,10 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <a class="admonition-anchor-link" href="creating_canister.html#admonition-note-1"></a>
 </div>
 <div>
-<p>By default the main database file is stored in the root folder: <code>/DB/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the databsae engine.</p>
+<p>By default the main database file is stored in the root folder: <code>/DB/main.db</code> and there are a few additional <a href="https://www.sqlite.org/tempfiles.html">helper files</a> that can be created by the database engine.</p>
 </div>
 </div>
-<h2 id="using-stable-structures"><a class="header" href="#using-stable-structures">Using Stable Structures</a></h2>
+<h2 id="using-stable-structures"><a class="header" href="#using-stable-structures">Using stable structures</a></h2>
 <p>You can freely create other stable structures for your extra storage needs, just make sure to use a virtual memory ID that is not yet occupied.</p>
 <div id="admonition-use-memory-manager" class="admonition admonish-warning" role="note" aria-labelledby="admonition-use-memory-manager-title">
 <div class="admonition-title">
