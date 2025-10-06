@@ -233,7 +233,7 @@ Finally, use <code>wasi2ic</code> to produce a Wasm executable on the Internet C
 <h2 id="accessing-the-database"><a class="header" href="#accessing-the-database">Accessing the database</a></h2>
 <p>The database connection is established with the first call to <code>ic_rusqlite::with_connection(...)</code>, so there is no need to explicitly initialize or create a database.</p>
 <p>Internally, the <code>ic-rusqlite</code> uses <a href="https://dfinity.github.io/stable-structures/">stable structures</a> with the <a href="https://dfinity.github.io/stable-structures/concepts/memory-manager.html">memory manager</a>. The virtual memories <code>101..119</code> are reserved for the file system.</p>
-<p>The database database file is <code>/DB/main.db</code>, it is configured for be stored in the Virtual Memory <code>120</code>. These settings are default, but can be change via the <code>set_connection_config(...)</code> function.</p>
+<p>The database database file is <code>/DB/main.db</code>, it is configured to be stored in the Virtual Memory <code>120</code>. These settings are default, but can be change via the <code>set_connection_config(...)</code> function.</p>
 <div id="admonition-note" class="admonition admonish-note" role="note" aria-labelledby="admonition-note-title">
 <div class="admonition-title">
 <div id="admonition-note-title">
