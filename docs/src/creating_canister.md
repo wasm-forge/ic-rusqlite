@@ -57,7 +57,7 @@ The database connection is established with the first call to `ic_rusqlite::with
 Internally, the `ic-rusqlite` uses [stable structures](https://dfinity.github.io/stable-structures/) with the [memory manager](https://dfinity.github.io/stable-structures/concepts/memory-manager.html). The virtual memories `101..119` are reserved for the file system.
 
 
-The database database file is `/DB/main.db`, it is configured for be stored in the Virtual Memory `120`. These settings are default, but can be change via the `set_connection_config(...)` function.
+The database database file is `/DB/main.db`, it is configured to be stored in the Virtual Memory `120`. These settings are default, but can be change via the `set_connection_config(...)` function.
 
 ```admonish note
 The ability to associate a file with a virtual memory is a special feature of [`stable-fs`](https://github.com/wasm-forge/stable-fs). This allows to create dedicated files with fast I/O access.

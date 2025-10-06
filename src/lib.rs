@@ -17,7 +17,7 @@ const DEFAULT_MOUNTED_DB_ID: u8 = 120;
 /// Database file name
 const DEFAULT_DB_FILE_NAME: &str = "./DB/main.db";
 
-// re-export some of the core dependencies for others to use
+// Re-export some of the core dependencies for others to use
 pub use ic_wasi_polyfill;
 pub use rusqlite;
 pub use rusqlite::*;
