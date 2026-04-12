@@ -432,9 +432,7 @@ dependencies = [
 
 [[package]]
 name = "ic-wasi-polyfill"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80cd9fe7604444b88b3210cd1b899e525dd255b101b265c2b25106d49311d679"
+version = "0.11.1"
 dependencies = [
  "anyhow",
  "ic-cdk",
@@ -495,8 +493,6 @@ checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
 [[package]]
 name = "libsqlite3-sys"
 version = "0.35.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "133c182a6a2c87864fe97778797e46c7e999672690dc9fa3ee8e241aa4a9c13f"
 dependencies = [
  "cc",
  "pkg-config",
@@ -644,8 +640,6 @@ dependencies = [
 [[package]]
 name = "rusqlite"
 version = "0.37.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "165ca6e57b20e1351573e3729b958bc62f0e48025386970b6e4d29e7a7e71f3f"
 dependencies = [
  "bitflags",
  "fallible-iterator",
