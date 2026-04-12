@@ -29,10 +29,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        run: |
-          rustup update
-          
       - name: Install wasi2ic and wasm32-wasip1
         run: |
           rustup target add wasm32-wasip1

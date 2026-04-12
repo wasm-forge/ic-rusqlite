@@ -23,9 +23,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Rust version
         run: |
-          rustup update
+          echo `rustc -V`
 
       - name: Download WASI-SDK and wasi2ic
         run: |
