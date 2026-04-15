@@ -37,6 +37,8 @@ fi
   
 export WASI_DIR=wasi-sdk-$SDK_VERSION.0-$ARCH-$OS
 export WASI_SDK_PATH=$SDK_DIR/$WASI_DIR
+export CC_wasm32_wasip1=$WASI_SDK_PATH/bin/clang
+export CFLAGS_wasm32_wasip1=--sysroot=$WASI_SDK_PATH/share/wasi-sysroot
 
 if [ "$1" = "--sdk" ]; then
   echo $WASI_SDK_PATH
@@ -103,11 +105,15 @@ echo "Preparing .bashrc update..."
 
 line1="export WASI_SDK_PATH=$WASI_SDK_PATH"
 line2='export PATH=$WASI_SDK_PATH/bin:$PATH'
+line3='export CC_wasm32_wasip1=$CC_wasm32_wasip1'
+line4='export CFLAGS_wasm32_wasip1=$CFLAGS_wasm32_wasip1'
 
 FOUND1=`grep -F "$line1" "$BASHRC" 2>/dev/null || true`
 FOUND2=`grep -F "$line2" "$BASHRC" 2>/dev/null || true`
+FOUND3=`grep -F "$line3" "$BASHRC" 2>/dev/null || true`
+FOUND4=`grep -F "$line4" "$BASHRC" 2>/dev/null || true`
 
-if [ -n "$FOUND1" ] && [ -n "$FOUND2" ]; then
+if [ -n "$FOUND1" ] && [ -n "$FOUND2" ] && [ -n "$FOUND3" ] && [ -n "$FOUND4" ]; then
     echo "✅ .bashrc is ready"
     exit 0
 fi
@@ -129,6 +135,9 @@ case "$RESPONSE" in
   y|Y)
     echo "$line1" >> "$BASHRC"
     echo "$line2" >> "$BASHRC"
+    echo "$line3" >> "$BASHRC"
+    echo "$line4" >> "$BASHRC"
+
     echo "" >> "$BASHRC"
     echo "✅ .bashrc updated"
     echo "Restart your shell for the changes to take effect..."
@@ -138,6 +147,8 @@ case "$RESPONSE" in
     echo 'To enable compilation, make sure you point $WASI_SDK_PATH to the WASI-SDK installation and ensure the WASI-oriented clang compiler is available on the PATH:'
     echo "$line1"
     echo "$line2"
+    echo "$line3"
+    echo "$line4"
     ;;
 esac
 
