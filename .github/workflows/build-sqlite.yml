@@ -30,8 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Rust version
-        run: |
-          echo `rustc -V`
+        run: rustc --version
 
       - name: Download WASI-SDK and wasi2ic
         run: |

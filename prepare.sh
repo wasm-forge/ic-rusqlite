@@ -135,8 +135,8 @@ case "$RESPONSE" in
   y|Y)
     echo "$line1" >> "$BASHRC"
     echo "$line2" >> "$BASHRC"
-#    echo "$line3" >> "$BASHRC"
-#    echo "$line4" >> "$BASHRC"
+    echo "$line3" >> "$BASHRC"
+    echo "$line4" >> "$BASHRC"
 
     echo "" >> "$BASHRC"
     echo "✅ .bashrc updated"
