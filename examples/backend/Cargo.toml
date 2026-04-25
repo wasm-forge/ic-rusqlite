@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 [dependencies]
 candid = "0.10"
 hex = "0.4.3"
-ic-cdk = "0.18.5"
+ic-cdk = "0.20.0"
 
 ic-rusqlite = { path = "../../../ic-rusqlite"}
 

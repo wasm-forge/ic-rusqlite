@@ -255,7 +255,7 @@ fn insert(person: Person) -> Result {
 }
 
 #[update]
-fn delete(id: usize) -> Result {
+fn delete(id: i64) -> Result {
     with_connection(
         |conn| match conn.execute("delete from person where id=?1", (id,)) {
             Ok(e) => Ok(format!("{:?}", e)),
@@ -285,20 +285,20 @@ fn update(params: UpdateParams) -> Result {
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]
 struct Person {
     name: String,
-    age: usize,
+    age: i64,
 }
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]
 struct PersonQuery {
-    id: usize,
+    id: i64,
     name: String,
-    age: usize,
+    age: i64,
 }
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]
 struct QueryParams {
-    limit: usize,
-    offset: usize,
+    limit: i64,
+    offset: i64,
 }
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]
@@ -308,7 +308,7 @@ struct FilterParams {
 
 #[derive(CandidType, Debug, Serialize, Deserialize, Default)]
 struct UpdateParams {
-    id: usize,
+    id: i64,
     name: String,
 }
 
