@@ -18,7 +18,7 @@ type QueryResult = variant {
 
 type Person = record {
     name: text;
-    age: nat64
+    age: int64
 };
 
 type QueryParams = record {

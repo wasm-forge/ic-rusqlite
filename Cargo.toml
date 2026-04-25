@@ -1,6 +1,6 @@
 [package]
 name = "ic-rusqlite"
-version = "0.4.3"
+version = "0.5.0"
 edition = "2024"
 keywords = ["internet-computer", "wasi", "sqlite"]
 description = "The project provides easy-to-use library to enable SQLite in your Internet Computer canister."
@@ -20,16 +20,16 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 candid = "0.10"
-ic-cdk = "0.18"
+ic-cdk = "0.20"
 hex = "0.4.3"
 serde = "1.0.164"
 serde_json = "1.0.143"
 
 ic-stable-structures = "0.7.2"
-ic-wasi-polyfill = "0.11.0"
+ic-wasi-polyfill = "0.13.0"
 #ic-wasi-polyfill = {path = "../ic-wasi-polyfill/ic-wasi-polyfill"}
 
-rusqlite = { version = "0.37", optional = true}
+rusqlite = { version = "0.39", optional = true}
 #rusqlite = { path = "../../examples/rusqlite", optional = true}
 
 anyhow = "1.0.99"
