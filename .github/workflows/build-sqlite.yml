@@ -46,7 +46,7 @@ jobs:
           echo ...
 
       - name: Unzip
-        run: unzip lib/src.zip -d lib/src
+        run: unzip lib/src.zip -d lib
 
       - name: Build sqlite3 for WASI
         run: |
